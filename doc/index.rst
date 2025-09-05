@@ -1,7 +1,7 @@
-Welcome to Example Application's documentation!
-===============================================
+Welcome to RH Sensor in Rust application documentation!
+=======================================================
 
-This is a simple Sphinx documentation setup for ``example-application``.
+This is a simple Sphinx documentation setup for ``RH Sensor in Rust``.
 
 .. toctree::
    :maxdepth: 2
