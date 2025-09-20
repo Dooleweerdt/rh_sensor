@@ -1,0 +1,1 @@
+/home/brian/Tools/openocd-esp32/src/openocd -s /home/brian/Projects/zephyr_workspace/zephyr/boards/espressif/esp32c3_devkitm/support -s /home/brian/Tools/openocd-esp32/tcl -f /home/brian/Tools/openocd-esp32/tcl/board/esp32c3-builtin.cfg -c "gdb memory_map disable" -c "program_esp build/zephyr/zephyr.bin 0x10000 verify reset exit"
