@@ -25,4 +25,13 @@
 		led-gpios = <&gpio0 10 GPIO_ACTIVE_HIGH>;
 		blink-period-ms = <1000>;
 	};
+
+	chosen {
+		zephyr,console = &usb_serial;
+		zephyr,shell-uart = &usb_serial;
+	};
+};
+
+&usb_serial {
+	status = "okay";
 };
