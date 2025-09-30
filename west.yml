@@ -8,6 +8,8 @@ manifest:
   remotes:
     - name: zephyrproject-rtos
       url-base: https://github.com/zephyrproject-rtos
+    - name: mcuboot-remote
+      url-base: https://github.com/mcu-tools
 
   projects:
     - name: zephyr
@@ -21,3 +23,8 @@ manifest:
           - hal_nordic # required by the custom_plank board (Nordic based)
           - hal_stm32  # required by the nucleo_f302r8 board (STM32 based)
           - hal_espressif # required by the esp32 board (Espressif based)
+
+    - name: mcuboot
+      remote: mcuboot-remote
+      revision: v2.2.0
+      path: bootloader/mcuboot
