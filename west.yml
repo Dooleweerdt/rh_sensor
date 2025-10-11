@@ -26,5 +26,5 @@ manifest:
 
     - name: mcuboot
       remote: mcuboot-remote
-      revision: v2.2.0
+      revision: main
       path: bootloader/mcuboot
