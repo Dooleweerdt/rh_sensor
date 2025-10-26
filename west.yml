@@ -20,6 +20,7 @@ manifest:
         # strictly needed by the application.
         name-allowlist:
           - cmsis_6    # required by the ARM port for Cortex-M
+          - mbedtls
           - hal_nordic # required by the custom_plank board (Nordic based)
           - hal_stm32  # required by the nucleo_f302r8 board (STM32 based)
           - hal_espressif # required by the esp32 board (Espressif based)

@@ -35,3 +35,7 @@
 &usb_serial {
 	status = "okay";
 };
+
+&wifi {
+    status = "okay";
+};
