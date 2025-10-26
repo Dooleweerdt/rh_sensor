@@ -11,6 +11,13 @@
 
 #include <app_version.h>
 
+// Custom libraries
+#include "wifi.h"
+
+// WiFi settings - TBD: How to avoid exposure in public repo!!!
+#define WIFI_SSID "ExampleSSID"
+#define WIFI_PSK "ExamplePassword"
+
 LOG_MODULE_REGISTER(main, CONFIG_APP_LOG_LEVEL);
 
 #define BLINK_PERIOD_MS_STEP 100U
@@ -44,6 +51,21 @@ int main(void)
 	}
 
 	printk("Use the sensor to change LED blinking period\n");
+
+    // Wifi initialization - Test code
+    wifi_init();
+
+    // Connect to the WiFi network (blocking)
+    ret = wifi_connect(WIFI_SSID, WIFI_PSK);
+    if (ret < 0) {
+        printk("Error (%d): WiFi connection failed\r\n", ret);
+        return 0;
+    }
+
+    // Wait to receive an IP address (blocking)
+    wifi_wait_for_ip_addr();
+
+    // Wifi initialization - Test code End
 
 	while (1) {
 		ret = sensor_sample_fetch(sensor);

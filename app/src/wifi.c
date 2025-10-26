@@ -14,7 +14,7 @@ static K_SEM_DEFINE(sem_ipv4, 0, 1);
 
 // Called when the WiFi is connected
 static void on_wifi_connection_event(struct net_mgmt_event_callback *cb,
-                                     uint32_t mgmt_event,
+                                     uint64_t mgmt_event,
                                      struct net_if *iface)
 {
     const struct wifi_status *status = (const struct wifi_status *)cb->info;
@@ -38,7 +38,7 @@ static void on_wifi_connection_event(struct net_mgmt_event_callback *cb,
 
 // Event handler for WiFi management events
 static void on_ipv4_obtained(struct net_mgmt_event_callback *cb,
-                             uint32_t mgmt_event,
+                             uint64_t mgmt_event,
                              struct net_if *iface)
 {
     // Signal that the IP address has been obtained
