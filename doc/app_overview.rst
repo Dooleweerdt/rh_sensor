@@ -9,8 +9,6 @@ Sensor values are measured with the following sensors:
 * RH values with an SHT30 humidity and temperature sensor
 * Additional One-Wire (DS18B20) temperature sensor.
 
-# Test
-# Test 2
 
 
 .. raw:: html
