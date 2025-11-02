@@ -7,7 +7,9 @@ This is a simple Sphinx documentation setup for ``RH Sensor in Rust``.
    :maxdepth: 2
    :caption: Contents
 
+   app_overview
    zephyr
+
 
 Indices and tables
 ==================
