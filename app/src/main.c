@@ -12,7 +12,7 @@
 #include <app_version.h>
 
 // Custom libraries
-#include "wifi.h"
+#include <app/drivers/wifi.h>
 
 // WiFi settings - TBD: How to avoid exposure in public repo!!!
 #define WIFI_SSID "ExampleSSID"
@@ -52,6 +52,7 @@ int main(void)
 
 	printk("Use the sensor to change LED blinking period\n");
 
+    #if CONFIG_WIFI
     // Wifi initialization - Test code
     wifi_init();
 
@@ -66,6 +67,7 @@ int main(void)
     wifi_wait_for_ip_addr();
 
     // Wifi initialization - Test code End
+    #endif
 
 	while (1) {
 		ret = sensor_sample_fetch(sensor);
