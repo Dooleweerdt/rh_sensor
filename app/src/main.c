@@ -7,6 +7,12 @@
 #include <zephyr/drivers/sensor.h>
 #include <zephyr/logging/log.h>
 
+#ifdef CONFIG_MCUMGR_GRP_FS
+#include <zephyr/device.h>
+#include <zephyr/fs/fs.h>
+#include <zephyr/fs/littlefs.h>
+#endif
+
 #include <app/drivers/blink.h>
 
 #include <app_version.h>
@@ -23,6 +29,19 @@ LOG_MODULE_REGISTER(main, CONFIG_APP_LOG_LEVEL);
 #define BLINK_PERIOD_MS_STEP 100U
 #define BLINK_PERIOD_MS_MAX  1000U
 
+#define STORAGE_PARTITION_LABEL	storage_partition
+#define STORAGE_PARTITION_ID	FIXED_PARTITION_ID(STORAGE_PARTITION_LABEL)
+
+#ifdef CONFIG_MCUMGR_GRP_FS
+FS_LITTLEFS_DECLARE_DEFAULT_CONFIG(cstorage);
+static struct fs_mount_t littlefs_mnt = {
+	.type = FS_LITTLEFS,
+	.fs_data = &cstorage,
+	.storage_dev = (void *)STORAGE_PARTITION_ID,
+	.mnt_point = "/lfs1"
+};
+#endif
+
 int main(void)
 {
 	int ret;
@@ -31,6 +50,14 @@ int main(void)
 	struct sensor_value last_val = { 0 }, val;
 
 	printk("Zephyr Example Application %s\n", APP_VERSION_STRING);
+
+    /* Register the built-in mcumgr command handlers. */
+    #ifdef CONFIG_MCUMGR_GRP_FS
+        int rc = fs_mount(&littlefs_mnt);
+        if (rc < 0) {
+            LOG_ERR("Error mounting littlefs [%d]", rc);
+        }
+    #endif
 
 	sensor = DEVICE_DT_GET(DT_NODELABEL(example_sensor));
 	if (!device_is_ready(sensor)) {
