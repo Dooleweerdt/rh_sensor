@@ -12,7 +12,7 @@ Update west.yml to include module for zephyr-lang-rust:
       remote: zephyrproject-rtos
 
 
-Additionally the clang compiler is required - if you see this error will occur during build:
+Additionally the clang compiler is required - if you see this error during build:
 
 .. code-block:: text
 
