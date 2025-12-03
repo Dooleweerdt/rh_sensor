@@ -5,6 +5,7 @@ Zephyr documentation:
 :external+zephyr:ref:`getting_started`.
 
 `Zephyr Example Application <https://github.com/zephyrproject-rtos/example-application>`_ 
+
 `Zephyr Rust Example <https://github.com/zephyrproject-rtos/zephyr-lang-rust>`_
 
 
