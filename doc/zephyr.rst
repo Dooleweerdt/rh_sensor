@@ -5,6 +5,12 @@ Zephyr documentation:
 :external+zephyr:ref:`getting_started`.
 
 `Zephyr Example Application <https://github.com/zephyrproject-rtos/example-application>`_ 
+`Zephyr Rust Example <https://github.com/zephyrproject-rtos/zephyr-lang-rust>`_
+
+
+Rust documentation:
+
+* `The Rust Programming Language: <https://doc.rust-lang.org/edition-guide/rust-2024/language.html>`_
 
 
 Inspiration links:
