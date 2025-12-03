@@ -19,4 +19,5 @@ Application targets are:
 
 * `Adafruit Feather nRF52840 Express board <https://www.adafruit.com/product/4062>`_
 * `DFRobot Beetle ESP32-C3 board <https://www.dfrobot.com/product-2566.html>`_
+
 The Adafruit Feather is only used for development and testing of the RH sensor functionality.
