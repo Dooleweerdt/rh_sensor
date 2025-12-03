@@ -1,5 +1,5 @@
-Zephyr
-======
+Zephyr docs & links
+========================
 
 Zephyr documentation:
 :external+zephyr:ref:`getting_started`.
