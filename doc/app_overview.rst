@@ -13,3 +13,9 @@ Sensor values are measured with the following sensors:
 
 .. raw:: html
     :file: ./RhSensorInRust.drawio.html
+
+
+Application targets are:
+
+* Adafruit Feather nRF52840 Express board
+* DFRobot Beetle ESP32-C3 board
