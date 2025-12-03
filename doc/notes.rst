@@ -14,11 +14,13 @@ Update west.yml to include module for zephyr-lang-rust:
 
 Additionally the clang compiler is required - if you see this error will occur during build:
 
-.. WARNING::
+.. code-block:: text
+
     ~/Projects/zephyr_workspace/zephyr/include/zephyr/kernel_includes.h:20:10: fatal error: 'stddef.h' file not found
 
 
 To fix it run:
+
 .. code-block:: sh
 
     sudo apt install clang
