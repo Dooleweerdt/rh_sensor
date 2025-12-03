@@ -33,6 +33,14 @@
  	};
 };
 
+&i2c0 { /* SDA P8, SCL P9, Alert P2 */
+	sht3xd:sht3xd@45 {
+		compatible = "sensirion,sht3xd";
+		reg = <0x45>; /* ADDR pin pulled high, else 0x44 */
+		alert-gpios = <&gpio0 2 GPIO_ACTIVE_HIGH>;
+	};
+};
+
 &usb_serial {
 	status = "okay";
 };
