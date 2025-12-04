@@ -30,7 +30,7 @@ manifest:
 
     - name: mcuboot
       remote: mcuboot-remote
-      revision: main
+      revision: v2.3.0-rc1
       path: bootloader/mcuboot
 
     - name: zephyr-lang-rust
