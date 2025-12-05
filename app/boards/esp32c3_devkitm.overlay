@@ -10,9 +10,10 @@
  */
 
 / {
-	/*aliases {
-		sw0 = &user_button1;
-	};*/
+	aliases {
+		/*sw0 = &user_button1;*/
+		led0 = &blue_led;
+	};
 
 	/* This uses the same gpio as th user button declared in board file! */
 	example_sensor: example-sensor {
@@ -20,11 +21,21 @@
 		input-gpios = <&gpio0 9 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
 	};
 
-	blink_led: blink-led {
+	/*blink_led: blink-led {
 		compatible = "blink-gpio-led";
 		led-gpios = <&gpio0 10 GPIO_ACTIVE_HIGH>;
 		blink-period-ms = <1000>;
+	};*/
+	
+	leds {
+		compatible = "gpio-leds";
+
+		blue_led: led_0 {
+			gpios = <&gpio0 10 GPIO_ACTIVE_HIGH>;
+			label = "Blue LED";
+		};
 	};
+
 
 	chosen {
 		zephyr,console = &usb_serial;
