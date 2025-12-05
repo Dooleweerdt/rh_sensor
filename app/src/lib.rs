@@ -8,8 +8,7 @@
 // build.  So, this is just always necessary.
 #![allow(unexpected_cfgs)]
 
-use log::warn;
-
+use log::info;
 use zephyr::raw::ZR_GPIO_OUTPUT_ACTIVE;
 use zephyr::time::{sleep, Duration};
 
@@ -19,24 +18,24 @@ extern "C" fn rust_main() {
         zephyr::set_logger().unwrap();
     }
 
-    warn!("Starting blinky");
+    info!("Starting blinky");
 
     do_blink();
 }
 
 #[cfg(dt = "aliases::led0")]
 fn do_blink() {
-    warn!("Inside of blinky");
+    info!("Inside of blinky");
 
     let mut led0 = zephyr::devicetree::aliases::led0::get_instance().unwrap();
 
     if !led0.is_ready() {
-        warn!("LED is not ready");
+        info!("LED is not ready");
         loop {}
     }
 
     led0.configure(ZR_GPIO_OUTPUT_ACTIVE);
-    let duration = Duration::millis_at_least(500);
+    let duration = Duration::millis_at_least(100);
     loop {
         led0.toggle_pin();
         sleep(duration);
@@ -45,6 +44,9 @@ fn do_blink() {
 
 #[cfg(not(dt = "aliases::led0"))]
 fn do_blink() {
-    warn!("No leds configured");
-    loop {}
+    let duration = Duration::millis_at_least(5000);
+    loop {
+        sleep(duration);
+        info!("No leds configured");
+    }
 }

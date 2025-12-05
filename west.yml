@@ -10,6 +10,8 @@ manifest:
       url-base: https://github.com/zephyrproject-rtos
     - name: mcuboot-remote
       url-base: https://github.com/mcu-tools
+    - name: zephyr-lang-rust
+      url-base: https://github.com/Dooleweerdt
 
   projects:
     - name: zephyr
@@ -36,4 +38,4 @@ manifest:
     - name: zephyr-lang-rust
       revision: main
       path: modules/lang/rust
-      remote: zephyrproject-rtos
+      remote: zephyr-lang-rust

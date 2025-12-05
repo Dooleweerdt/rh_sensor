@@ -3,8 +3,8 @@ name: Build
 on:
   push:
   pull_request:
-  schedule:
-    - cron: "0 0 * * *"
+  #schedule:
+  #  - cron: "0 0 * * *"
 
 jobs:
   build:
@@ -38,6 +38,8 @@ jobs:
             EXTRA_TWISTER_FLAGS="--short-build-path -O/tmp/twister-out"
           fi
           west blobs fetch hal_espressif
+          rustup target add thumbv7em-none-eabi
+          rustup target add riscv64imac-unknown-none-elf
           west twister -T app -v --inline-logs --integration $EXTRA_TWISTER_FLAGS
 
       - name: Twister Tests
@@ -48,4 +50,6 @@ jobs:
             EXTRA_TWISTER_FLAGS="--short-build-path -O/tmp/twister-out"
           fi
           west blobs fetch hal_espressif
+          rustup target add thumbv7em-none-eabi
+          rustup target add riscv64imac-unknown-none-elf
           west twister -T tests -v --inline-logs --integration $EXTRA_TWISTER_FLAGS
