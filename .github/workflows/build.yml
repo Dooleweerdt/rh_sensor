@@ -39,7 +39,7 @@ jobs:
           fi
           west blobs fetch hal_espressif
           rustup target add thumbv7em-none-eabi
-          rustup target add riscv64imac-unknown-none-elf
+          rustup target add riscv32i-unknown-none-elf
           west twister -T app -v --inline-logs --integration $EXTRA_TWISTER_FLAGS
 
       - name: Twister Tests
@@ -51,5 +51,5 @@ jobs:
           fi
           west blobs fetch hal_espressif
           rustup target add thumbv7em-none-eabi
-          rustup target add riscv64imac-unknown-none-elf
+          rustup target add riscv32i-unknown-none-elf
           west twister -T tests -v --inline-logs --integration $EXTRA_TWISTER_FLAGS
