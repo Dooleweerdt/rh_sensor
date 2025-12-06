@@ -36,6 +36,6 @@ manifest:
       path: bootloader/mcuboot
 
     - name: zephyr-lang-rust
-      revision: main
+      revision: esp32c3_support
       path: modules/lang/rust
       remote: zephyr-lang-rust
