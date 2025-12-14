@@ -27,6 +27,7 @@ To fix it run:
     sudo apt install clang
 
 
+
 Required modifications to access device and sensor APIs from Rust:
 
 Make sure to enable the use of zephyr-sys in Cargo.toml the application (rh_sensor):
