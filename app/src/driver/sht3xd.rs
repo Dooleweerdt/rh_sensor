@@ -1,18 +1,16 @@
 use core::ffi::CStr;
-use zephyr_sys::{device, device_get_binding, device_is_ready}; //, sensor_sample_fetch, sensor_channel_get, sensor_value};
+use zephyr_sys::{device, device_get_binding, device_is_ready, 
+                sensor_sample_fetch, sensor_channel_get, sensor_value,
+                sensor_channel_SENSOR_CHAN_AMBIENT_TEMP, sensor_channel_SENSOR_CHAN_HUMIDITY};
 
 use log::info;
 
 pub fn read_sensor_example() {
     unsafe {
-        // 1. Get the device pointer (Using the label from your DTS/Overlay)
-        // Ensure your sensor has a "label" property or use the node name if supported
-        let sensor_label = CStr::from_bytes_with_nul(b"sht3xd@45\0").unwrap();  //<__device_dts_ord_94>
+        let sensor_label = CStr::from_bytes_with_nul(b"sht3xd@45\0").unwrap();
         let dev: *const device = device_get_binding(sensor_label.as_ptr());
 
         if dev.is_null() {
-            info!("sensor_label: {:?}", sensor_label);
-            info!("dev pointer: {:?}", dev);
             info!("Error: Device not found!");
             return;
         }
@@ -23,5 +21,27 @@ pub fn read_sensor_example() {
         else {
             info!("SHT3Xd is NOT ready");
         }
+
+        let ret = sensor_sample_fetch(dev);
+        if ret != 0 {
+            info!("Error fetching sensor sample: {}", ret);
+            return;
+        }
+
+        let mut temperature = sensor_value { val1: 0, val2: 0 };
+        let mut humidity = sensor_value { val1: 0, val2: 0 };
+        let ret = sensor_channel_get(dev, sensor_channel_SENSOR_CHAN_AMBIENT_TEMP, &mut temperature);
+        if ret != 0 {
+            info!("Error getting temperature: {}", ret);
+            return;
+        }
+
+        let ret = sensor_channel_get(dev, sensor_channel_SENSOR_CHAN_HUMIDITY as u32, &mut humidity);
+        if ret != 0 {
+            info!("Error getting humidity: {}", ret);
+            return;
+        }
+        info!("Temperature: {}.{} C", temperature.val1, temperature.val2);
+        info!("Humidity: {}.{} %%", humidity.val1, humidity.val2);
     }
 }
