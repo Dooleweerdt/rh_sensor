@@ -28,9 +28,9 @@ To fix it run:
 
 
 Required modifications to access device and sensor APIs from Rust:
-------------------------------------------------------------------------
 
 Make sure to enable the use of zephyr-sys in Cargo.toml the application (rh_sensor):
+
 .. code-block:: toml
 
     [dependencies]
@@ -40,6 +40,7 @@ Make sure to enable the use of zephyr-sys in Cargo.toml the application (rh_sens
 Make sure to add sensor includes to zephyr-sys wrapper.h and build.rs:
 
 In wrapper.h add:
+
 .. code-block:: c
 
     // Added by BDR to include sensor API
@@ -47,6 +48,7 @@ In wrapper.h add:
 
 
 In build.rs add:
+
 .. code-block:: rust
     
     .allowlist_function("sensor\_.*")
