@@ -48,7 +48,7 @@ In wrapper.h add:
 
 In build.rs add:
 .. code-block:: rust
-
-    .allowlist_function("sensor_.*")
-    .allowlist_item("SENSOR_.*")
+    
+    .allowlist_function("sensor\_.*")
+    .allowlist_item("SENSOR\_.*")
 
