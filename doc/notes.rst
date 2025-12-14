@@ -26,3 +26,29 @@ To fix it run:
 
     sudo apt install clang
 
+
+Required modifications to access device and sensor APIs from Rust:
+------------------------------------------------------------------------
+
+Make sure to enable the use of zephyr-sys in Cargo.toml the application (rh_sensor):
+.. code-block:: toml
+
+    [dependencies]
+    zephyr-sys = { version = "0.1.0", path = "../../modules/lang/rust/zephyr-sys" }
+
+
+Make sure to add sensor includes to zephyr-sys wrapper.h and build.rs:
+
+In wrapper.h add:
+.. code-block:: c
+
+    // Added by BDR to include sensor API
+    #include <zephyr/drivers/sensor.h>
+
+
+In build.rs add:
+.. code-block:: rust
+
+    .allowlist_function("sensor_.*")
+    .allowlist_item("SENSOR_.*")
+
