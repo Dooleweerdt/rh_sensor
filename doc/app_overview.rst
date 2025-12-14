@@ -10,9 +10,16 @@ Sensor values are measured with the following sensors:
 * Additional One-Wire (DS18B20) temperature sensor.
 
 
+Original idea:
 
 .. raw:: html
     :file: ./RhSensorInRust.drawio.html
+
+
+Updated idea, after learning some more rust:
+
+.. raw:: html
+    :file: ./RhSensorInRust_v2.drawio.html
 
 
 Application targets are:
