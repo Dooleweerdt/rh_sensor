@@ -6,17 +6,16 @@ manifest:
     west-commands: scripts/west-commands.yml
 
   remotes:
-    - name: zephyrproject-rtos
+    - name: zephyr-upstream
       url-base: https://github.com/zephyrproject-rtos
+    - name: zephyr-downstream
+      url-base: https://github.com/Dooleweerdt
     - name: mcuboot-remote
       url-base: https://github.com/mcu-tools
-    - name: zephyr-lang-rust
-      url-base: https://github.com/Dooleweerdt
 
   projects:
     - name: zephyr
-      remote: zephyrproject-rtos
-      #revision: main // For edge use!
+      remote: zephyr-downstream
       revision: v4.3.0
       import:
         # By using name-allowlist we can clone only the modules that are
@@ -36,6 +35,6 @@ manifest:
       path: bootloader/mcuboot
 
     - name: zephyr-lang-rust
+      remote: zephyr-downstream
       revision: esp32c3_support
       path: modules/lang/rust
-      remote: zephyr-lang-rust
