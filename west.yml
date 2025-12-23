@@ -16,7 +16,7 @@ manifest:
   projects:
     - name: zephyr
       remote: zephyr-downstream
-      revision: v4.3.0
+      revision: 3568e1b6d5cdd51a6b964a2a1d6d29200fea2056 #v4.3.0
       import:
         # By using name-allowlist we can clone only the modules that are
         # strictly needed by the application.
