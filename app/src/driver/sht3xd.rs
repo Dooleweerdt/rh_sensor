@@ -22,26 +22,31 @@ pub fn read_sensor_example() {
             info!("SHT3Xd is NOT ready");
         }
 
-        let ret = sensor_sample_fetch(dev);
-        if ret != 0 {
-            info!("Error fetching sensor sample: {}", ret);
-            return;
-        }
+        loop {
+            let ret = sensor_sample_fetch(dev);
+            if ret != 0 {
+                info!("Error fetching sensor sample: {}", ret);
+                return;
+            }
 
-        let mut temperature = sensor_value { val1: 0, val2: 0 };
-        let mut humidity = sensor_value { val1: 0, val2: 0 };
-        let ret = sensor_channel_get(dev, sensor_channel_SENSOR_CHAN_AMBIENT_TEMP, &mut temperature);
-        if ret != 0 {
-            info!("Error getting temperature: {}", ret);
-            return;
-        }
+            let mut temperature = sensor_value { val1: 0, val2: 0 };
+            let mut humidity = sensor_value { val1: 0, val2: 0 };
+            let ret = sensor_channel_get(dev, sensor_channel_SENSOR_CHAN_AMBIENT_TEMP, &mut temperature);
+            if ret != 0 {
+                info!("Error getting temperature: {}", ret);
+                return;
+            }
 
-        let ret = sensor_channel_get(dev, sensor_channel_SENSOR_CHAN_HUMIDITY as u32, &mut humidity);
-        if ret != 0 {
-            info!("Error getting humidity: {}", ret);
-            return;
+            let ret = sensor_channel_get(dev, sensor_channel_SENSOR_CHAN_HUMIDITY as u32, &mut humidity);
+            if ret != 0 {
+                info!("Error getting humidity: {}", ret);
+                return;
+            }
+            info!(" - - - - ");
+            info!("Temperature: {}.{} C", temperature.val1, temperature.val2);
+            info!("Humidity: {}.{} %%", humidity.val1, humidity.val2);
+
+            zephyr::time::sleep(zephyr::time::Duration::secs_at_least(5));
         }
-        info!("Temperature: {}.{} C", temperature.val1, temperature.val2);
-        info!("Humidity: {}.{} %%", humidity.val1, humidity.val2);
     }
 }
