@@ -16,7 +16,8 @@ manifest:
   projects:
     - name: zephyr
       remote: zephyr-downstream
-      revision: 3568e1b6d5cdd51a6b964a2a1d6d29200fea2056 #v4.3.0
+      #revision: 3568e1b6d5cdd51a6b964a2a1d6d29200fea2056 #v4.3.0
+      revision: main
       import:
         # By using name-allowlist we can clone only the modules that are
         # strictly needed by the application.
@@ -31,7 +32,7 @@ manifest:
 
     - name: mcuboot
       remote: mcuboot-remote
-      revision: v2.3.0-rc1
+      revision: v2.3.0
       path: bootloader/mcuboot
 
     - name: zephyr-lang-rust
