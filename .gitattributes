@@ -1,0 +1,2 @@
+# Encrypt the MCUboot key
+rh_sensor_key.pem filter=git-crypt diff=git-crypt
