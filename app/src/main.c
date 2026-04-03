@@ -26,12 +26,12 @@ int main(void)
 	int ret;
 	unsigned int period_ms = BLINK_PERIOD_MS_MAX;
 	const struct device *sensor;
-    #if CONFIG_BLINK 
+    #if CONFIG_BLINK
     const struct device *blink;
     #endif
 	struct sensor_value last_val = { 0 }, val;
 
-	printk("Zephyr - RH Sensor in Rust %s\n", APP_BUILD_VERSION);
+	printk("Zephyr - RH Sensor in Rust %s\n", STRINGIFY(APP_BUILD_VERSION));
 
 	sensor = DEVICE_DT_GET(DT_NODELABEL(example_sensor));
 	if (!device_is_ready(sensor)) {
