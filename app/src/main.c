@@ -56,6 +56,7 @@ int main(void)
 	printk("Use the sensor to change LED blinking period\n");
 
     #if CONFIG_WIFI
+    #ifdef WIFI_SSID
     // Wifi initialization - Test code
     wifi_init();
 
@@ -70,6 +71,9 @@ int main(void)
     wifi_wait_for_ip_addr();
 
     // Wifi initialization - Test code End
+    #else
+    #error "WIFI_SSID is not defined. Please define WIFI_SSID and WIFI
+    #endif // WIFI_SSID
     #endif
 
 	while (1) {
