@@ -55,7 +55,7 @@ int main(void)
 	printk("Use the sensor to change LED blinking period\n");
 
     #if CONFIG_WIFI
-    #if WIFI_SSID
+    #if WIFI_CREDENTIALS
     // Wifi initialization - Test code
     wifi_init();
 
