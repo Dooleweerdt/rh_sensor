@@ -24,12 +24,11 @@ LOG_MODULE_REGISTER(main, CONFIG_APP_LOG_LEVEL);
 int main(void)
 {
 	int ret;
-	unsigned int period_ms = BLINK_PERIOD_MS_MAX;
 	const struct device *sensor;
     #if CONFIG_BLINK
     const struct device *blink;
     #endif
-	struct sensor_value last_val = { 0 }, val;
+	struct sensor_value val;
 
 	printk("Zephyr - RH Sensor in Rust %s\n", STRINGIFY(APP_BUILD_VERSION));
 
@@ -56,7 +55,7 @@ int main(void)
 	printk("Use the sensor to change LED blinking period\n");
 
     #if CONFIG_WIFI
-    #ifdef WIFI_SSID
+    #if WIFI_SSID
     // Wifi initialization - Test code
     wifi_init();
 
@@ -72,7 +71,7 @@ int main(void)
 
     // Wifi initialization - Test code End
     #else
-    #error "WIFI_SSID is not defined. Please define WIFI_SSID and WIFI
+    #error "WIFI_SSID is not defined. Please define WIFI_SSID and WIFI"
     #endif // WIFI_SSID
     #endif
 
@@ -83,29 +82,15 @@ int main(void)
 			return 0;
 		}
 
-		ret = sensor_channel_get(sensor, SENSOR_CHAN_PROX, &val);
+		ret = sensor_channel_get(sensor, SENSOR_CHAN_AMBIENT_TEMP, &val);
 		if (ret < 0) {
 			LOG_ERR("Could not get sample (%d)", ret);
 			return 0;
 		}
 
-		if ((last_val.val1 == 0) && (val.val1 == 1)) {
-			if (period_ms == 0U) {
-				period_ms = BLINK_PERIOD_MS_MAX;
-			} else {
-				period_ms -= BLINK_PERIOD_MS_STEP;
-			}
+        printk("Temperature: %d.%06d C\n", val.val1, val.val2);
 
-			printk("Proximity detected, setting LED period to %u ms\n",
-			       period_ms);
-            #if CONFIG_BLINK
-			blink_set_period_ms(blink, period_ms);
-            #endif
-		}
-
-		last_val = val;
-
-		k_sleep(K_MSEC(100));
+		k_sleep(K_MSEC(1000));
 	}
 
 	return 0;
