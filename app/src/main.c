@@ -25,10 +25,13 @@ int main(void)
 {
 	int ret;
 	unsigned int period_ms = BLINK_PERIOD_MS_MAX;
-	const struct device *sensor, *blink;
+	const struct device *sensor;
+    #if CONFIG_BLINK 
+    const struct device *blink;
+    #endif
 	struct sensor_value last_val = { 0 }, val;
 
-	printk("Zephyr - RH Sensor in Rust %s\n", APP_VERSION_STRING);
+	printk("Zephyr - RH Sensor in Rust %s\n", APP_BUILD_VERSION);
 
 	sensor = DEVICE_DT_GET(DT_NODELABEL(example_sensor));
 	if (!device_is_ready(sensor)) {
@@ -36,6 +39,7 @@ int main(void)
 		return 0;
 	}
 
+    #if CONFIG_BLINK
 	blink = DEVICE_DT_GET(DT_NODELABEL(blink_led));
 	if (!device_is_ready(blink)) {
 		LOG_ERR("Blink LED not ready");
@@ -47,6 +51,7 @@ int main(void)
 		LOG_ERR("Could not turn off LED (%d)", ret);
 		return 0;
 	}
+    #endif
 
 	printk("Use the sensor to change LED blinking period\n");
 
@@ -89,7 +94,9 @@ int main(void)
 
 			printk("Proximity detected, setting LED period to %u ms\n",
 			       period_ms);
+            #if CONFIG_BLINK
 			blink_set_period_ms(blink, period_ms);
+            #endif
 		}
 
 		last_val = val;
