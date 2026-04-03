@@ -13,10 +13,7 @@
 
 // Custom libraries
 #include <app/drivers/wifi.h>
-
-// WiFi settings - TBD: How to avoid exposure in public repo!!!
-#define WIFI_SSID "ExampleSSID"
-#define WIFI_PSK "ExamplePassword"
+#include <app/wifi_settings.h>
 
 LOG_MODULE_REGISTER(main, CONFIG_APP_LOG_LEVEL);
 

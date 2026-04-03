@@ -1,2 +1,4 @@
 # Encrypt the MCUboot key
 rh_sensor_key.pem filter=git-crypt diff=git-crypt
+# Encrypt the WiFi settings
+include/app/wifi_settings.h filter=git-crypt diff=git-crypt
