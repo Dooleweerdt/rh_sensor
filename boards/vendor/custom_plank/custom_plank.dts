@@ -6,6 +6,8 @@
 /dts-v1/;
 #include <nordic/nrf52840_qiaa.dtsi>
 #include "custom_plank-pinctrl.dtsi"
+#include <nordic/nrf52840_partition.dtsi>
+
 
 / {
 	model = "Custom Plank Board";
