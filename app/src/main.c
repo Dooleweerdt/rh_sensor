@@ -59,12 +59,14 @@ int main(void)
     // Wifi initialization - Test code
     wifi_init();
 
-    // Connect to the WiFi network (blocking)
-    ret = wifi_connect(WIFI_SSID, WIFI_PSK);
-    if (ret < 0) {
-        printk("Error (%d): WiFi connection failed\r\n", ret);
-        return 0;
-    }
+    do {
+        // Connect to the WiFi network (blocking)
+        ret = wifi_connect(WIFI_SSID, WIFI_PSK);
+        if (ret < 0) {
+            printk("Error (%d): WiFi connection failed. Retrying in 5s...\r\n", ret);
+            k_sleep(K_MSEC(5000)); // Wait before retrying
+        }
+    } while (ret < 0);
 
     // Wait to receive an IP address (blocking)
     wifi_wait_for_ip_addr();
