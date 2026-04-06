@@ -48,7 +48,6 @@ jobs:
             # 3. Ensure LIBCLANG_PATH is set (common issue on Mac runners)
             #echo "LIBCLANG_PATH=$(brew --prefix llvm)/lib" >> $GITHUB_ENV
             which clang
-            which llvm
           fi
           west blobs fetch hal_espressif
           rustup target add thumbv7em-none-eabi
