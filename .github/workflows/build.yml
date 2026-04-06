@@ -37,6 +37,12 @@ jobs:
           if [ "${{ runner.os }}" = "Windows" ]; then
             EXTRA_TWISTER_FLAGS="--short-build-path -O/tmp/twister-out"
           fi
+          if [ "${{ runner.os }}" = "macos-15" ]; then
+            echo "Debug output PATH: "
+            echo $PATH
+            echo "Additional clang args for bindgen:"
+            echo "BINDGEN_EXTRA_CLANG_ARGS=--target=thumbv7em-none-eabi -I$(arm-zephyr-eabi-gcc -print-file-name=include)" >> $GITHUB_ENV
+          fi
           west blobs fetch hal_espressif
           rustup target add thumbv7em-none-eabi
           rustup target add riscv32i-unknown-none-elf
@@ -51,6 +57,9 @@ jobs:
         run: |
           if [ "${{ runner.os }}" = "Windows" ]; then
             EXTRA_TWISTER_FLAGS="--short-build-path -O/tmp/twister-out"
+          fi
+          if [ "${{ runner.os }}" = "macos-15" ]; then
+            echo "BINDGEN_EXTRA_CLANG_ARGS=--target=thumbv7em-none-eabi -I$(arm-zephyr-eabi-gcc -print-file-name=include)" >> $GITHUB_ENV
           fi
           west blobs fetch hal_espressif
           rustup target add thumbv7em-none-eabi
