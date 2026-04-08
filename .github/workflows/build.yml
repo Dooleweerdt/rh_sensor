@@ -49,6 +49,8 @@ jobs:
             #echo "LIBCLANG_PATH=$(brew --prefix llvm)/lib" >> $GITHUB_ENV
             #which clang
             # Point to the bundled SDK Clang
+            printenv | grep ZEPHYR
+            echo "\r\nZEPHYR SDK PATH=$ZEPHYR_SDK_INSTALL_DIR\r\n"
             export LIBCLANG_PATH="$ZEPHYR_SDK_INSTALL_DIR/llvm/lib"
 
             # Tell bindgen to use the specific Clang binary from the SDK
