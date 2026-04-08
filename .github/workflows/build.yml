@@ -44,10 +44,18 @@ jobs:
             # echo "BINDGEN_EXTRA_CLANG_ARGS=--target=thumbv7em-none-eabi -I$(arm-zephyr-eabi-gcc -print-file-name=include)" >> $GITHUB_ENV
             # 1. Define the missing macros directly to bypass the header conflict
             # 2. Tell clang to target ARM so it doesn't use Mac-specific headers
-            echo "BINDGEN_EXTRA_CLANG_ARGS=-D__INT64_C(c)=cLL -D__UINT64_C(c)=cULL --target=thumbv7em-none-eabi" >> $GITHUB_ENV  
+            #echo "BINDGEN_EXTRA_CLANG_ARGS=-D__INT64_C(c)=cLL -D__UINT64_C(c)=cULL --target=thumbv7em-none-eabi" >> $GITHUB_ENV  
             # 3. Ensure LIBCLANG_PATH is set (common issue on Mac runners)
             #echo "LIBCLANG_PATH=$(brew --prefix llvm)/lib" >> $GITHUB_ENV
-            which clang
+            #which clang
+            # Point to the bundled SDK Clang
+            export LIBCLANG_PATH="$ZEPHYR_SDK_INSTALL_DIR/llvm/lib"
+
+            # Tell bindgen to use the specific Clang binary from the SDK
+            export CLANG_PATH="$ZEPHYR_SDK_INSTALL_DIR/llvm/bin/clang"
+
+            # Force the target so it doesn't use Mac system headers
+            export BINDGEN_EXTRA_CLANG_ARGS="--target=thumbv7em-none-eabi -D__INT64_C(c)=cLL -D__UINT64_C(c)=cULL"
           fi
           west blobs fetch hal_espressif
           rustup target add thumbv7em-none-eabi
