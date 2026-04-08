@@ -48,6 +48,7 @@ jobs:
             # 3. Ensure LIBCLANG_PATH is set (common issue on Mac runners)
             #echo "LIBCLANG_PATH=$(brew --prefix llvm)/lib" >> $GITHUB_ENV
             #which clang
+
             # Point to the bundled SDK Clang
             printenv
             echo "\r\nZEPHYR SDK PATH=$ZEPHYR_SDK_INSTALL_DIR\r\n"
