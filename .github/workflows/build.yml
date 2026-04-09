@@ -51,11 +51,12 @@ jobs:
 
             # Point to the bundled SDK Clang
             printenv
-            echo "\r\nZEPHYR SDK PATH=$ZEPHYR_SDK_INSTALL_DIR\r\n"
-            export LIBCLANG_PATH="$ZEPHYR_SDK_INSTALL_DIR/llvm/lib"
+            #echo "\r\nZEPHYR SDK PATH=$ZEPHYR_SDK_INSTALL_DIR\r\n"
+            echo "\r\bZEPHYR_SDK_PATH=/Users/runner/work/rh_sensor/rh_sensor/zephyr-sdk\r\n"
+            export LIBCLANG_PATH="/Users/runner/work/rh_sensor/rh_sensor/zephyr-sdk/llvm/lib"
 
             # Tell bindgen to use the specific Clang binary from the SDK
-            export CLANG_PATH="$ZEPHYR_SDK_INSTALL_DIR/llvm/bin/clang"
+            export CLANG_PATH="/Users/runner/work/rh_sensor/rh_sensor/zephyr-sdk/llvm/bin/clang"
 
             # Force the target so it doesn't use Mac system headers
             export BINDGEN_EXTRA_CLANG_ARGS="--target=thumbv7em-none-eabi -D__INT64_C(c)=cLL -D__UINT64_C(c)=cULL"
