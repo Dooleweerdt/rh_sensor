@@ -54,6 +54,8 @@ jobs:
             #echo "\r\nZEPHYR SDK PATH=$ZEPHYR_SDK_INSTALL_DIR\r\n"
             echo "\r\bZEPHYR_SDK_PATH=/Users/runner/work/rh_sensor/rh_sensor/zephyr-sdk\r\n"
             export LIBCLANG_PATH="/Users/runner/work/rh_sensor/rh_sensor/zephyr-sdk/llvm/lib"
+            echo "Clang dylib is here: "
+            find ./ -name *.dylib
 
             # Tell bindgen to use the specific Clang binary from the SDK
             export CLANG_PATH="/Users/runner/work/rh_sensor/rh_sensor/zephyr-sdk/llvm/bin/clang"
