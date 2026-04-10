@@ -40,34 +40,21 @@ jobs:
           if [ "${{ runner.os }}" = "macOS" ]; then
             echo "Debug output PATH: "
             echo $PATH
-            echo "Additional clang args for bindgen:"
-            # echo "BINDGEN_EXTRA_CLANG_ARGS=--target=thumbv7em-none-eabi -I$(arm-zephyr-eabi-gcc -print-file-name=include)" >> $GITHUB_ENV
-            # 1. Define the missing macros directly to bypass the header conflict
-            # 2. Tell clang to target ARM so it doesn't use Mac-specific headers
-            #echo "BINDGEN_EXTRA_CLANG_ARGS=-D__INT64_C(c)=cLL -D__UINT64_C(c)=cULL --target=thumbv7em-none-eabi" >> $GITHUB_ENV  
-            # 3. Ensure LIBCLANG_PATH is set (common issue on Mac runners)
-            #echo "LIBCLANG_PATH=$(brew --prefix llvm)/lib" >> $GITHUB_ENV
-            #which clang
 
-            # Point to the bundled SDK Clang
-            printenv
-            #echo "\r\nZEPHYR SDK PATH=$ZEPHYR_SDK_INSTALL_DIR\r\n"
-            echo "\r\bZEPHYR_SDK_PATH=/Users/runner/work/rh_sensor/rh_sensor/zephyr-sdk\r\n"
-            export LIBCLANG_PATH="/Users/runner/work/rh_sensor/rh_sensor/zephyr-sdk/llvm/lib"
-            echo "Clang dylib is here: "
-            find / -name libclang.dylib | grep libclang
-
-            # Tell bindgen to use the specific Clang binary from the SDK
-            export CLANG_PATH="/Users/runner/work/rh_sensor/rh_sensor/zephyr-sdk/llvm/bin/clang"
-
-            # Force the target so it doesn't use Mac system headers
-            export BINDGEN_EXTRA_CLANG_ARGS="--target=thumbv7em-none-eabi -D__INT64_C(c)=cLL -D__UINT64_C(c)=cULL"
+            # Find the exact path for macOS 15
+            LLVM_ROOT=$(brew --prefix llvm)
+            echo "LIBCLANG_PATH=$LLVM_ROOT/lib" >> $GITHUB_ENV
+            echo "CLANG_PATH=$LLVM_ROOT/bin/clang" >> $GITHUB_ENV
+            
+            # Crucial: This tells Bindgen to use the ARM target and fixes the __INT64_C error
+            echo "BINDGEN_EXTRA_CLANG_ARGS=--target=thumbv7em-none-eabi -D__INT64_C(c)=cLL -D__UINT64_C(c)=cULL" >> $GITHUB_ENV
           fi
+
           west blobs fetch hal_espressif
           rustup target add thumbv7em-none-eabi
           rustup target add riscv32i-unknown-none-elf
+
           # Remove the wifi_settings file as it is encrypted
-          pwd
           rm include/app/wifi_settings.h
           west twister -T app -v --inline-logs --integration $EXTRA_TWISTER_FLAGS
 
