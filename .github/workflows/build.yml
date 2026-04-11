@@ -38,7 +38,8 @@ jobs:
           echo "LIBCLANG_PATH=/opt/homebrew/Cellar/llvm@18/18.1.8/lib/libclang.dylib" >> $GITHUB_ENV
           echo "CLANG_PATH=/opt/homebrew/Cellar/llvm@18/18.1.8//bin/clang" >> $GITHUB_ENV
           # Note: We append the target and the macros
-          echo "BINDGEN_EXTRA_CLANG_ARGS=--target=thumbv7em-none-eabi -D__INT64_C(c)=c##LL -D__UINT64_C(c)=c##ULL" >> $GITHUB_ENV
+          #echo "BINDGEN_EXTRA_CLANG_ARGS=--target=thumbv7em-none-eabi -D__INT64_C(c)=c##LL -D__UINT64_C(c)=c##ULL" >> $GITHUB_ENV
+          echo "BINDGEN_EXTRA_CLANG_ARGS=-D__INT64_C(c)=c##LL -D__UINT64_C(c)=c##ULL" >> $GITHUB_ENV
 
       - name: Verify Environment
         run: |
