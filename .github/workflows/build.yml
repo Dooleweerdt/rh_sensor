@@ -34,7 +34,8 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           LLVM_ROOT=$(brew --prefix llvm)
-          echo "LIBCLANG_PATH=$LLVM_ROOT/lib" >> $GITHUB_ENV
+          #echo "LIBCLANG_PATH=$LLVM_ROOT/lib" >> $GITHUB_ENV
+          echo "LIBCLANG_PATH=/opt/homebrew/Cellar/llvm@18/18.1.8/lib/libclang.dylib" >> $GITHUB_ENV
           echo "CLANG_PATH=$LLVM_ROOT/bin/clang" >> $GITHUB_ENV
           # Note: We append the target and the macros
           echo "BINDGEN_EXTRA_CLANG_ARGS=--target=thumbv7em-none-eabi -D__INT64_C(c)=cLL -D__UINT64_C(c)=cULL" >> $GITHUB_ENV
