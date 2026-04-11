@@ -43,11 +43,16 @@ jobs:
 
             # Find the exact path for macOS 15
             LLVM_ROOT=$(brew --prefix llvm)
+            echo "LIBCLANG_PATH=$LLVM_ROOT/lib"
+            echo "CLANG_PATH=$LLVM_ROOT/bin/clang"
             echo "LIBCLANG_PATH=$LLVM_ROOT/lib" >> $GITHUB_ENV
             echo "CLANG_PATH=$LLVM_ROOT/bin/clang" >> $GITHUB_ENV
             
             # Crucial: This tells Bindgen to use the ARM target and fixes the __INT64_C error
+            echo "BINDGEN_EXTRA_CLANG_ARGS=--target=thumbv7em-none-eabi -D__INT64_C(c)=cLL -D__UINT64_C(c)=cULL"
             echo "BINDGEN_EXTRA_CLANG_ARGS=--target=thumbv7em-none-eabi -D__INT64_C(c)=cLL -D__UINT64_C(c)=cULL" >> $GITHUB_ENV
+            echo "Print GITHUB_ENV:"
+            echo "$GITHUB_ENV"
           fi
 
           west blobs fetch hal_espressif
