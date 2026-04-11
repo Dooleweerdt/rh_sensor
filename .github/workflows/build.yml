@@ -30,6 +30,20 @@ jobs:
           app-path: rh_sensor
           toolchains: arm-zephyr-eabi:riscv64-zephyr-elf
 
+      - name: Setup macOS LLVM Environment
+        if: runner.os == 'macOS'
+        run: |
+          LLVM_ROOT=$(brew --prefix llvm)
+          echo "LIBCLANG_PATH=$LLVM_ROOT/lib" >> $GITHUB_ENV
+          echo "CLANG_PATH=$LLVM_ROOT/bin/clang" >> $GITHUB_ENV
+          # Note: We append the target and the macros
+          echo "BINDGEN_EXTRA_CLANG_ARGS=--target=thumbv7em-none-eabi -D__INT64_C(c)=cLL -D__UINT64_C(c)=cULL" >> $GITHUB_ENV
+
+      - name: Verify Environment
+        run: |
+          echo "The clang path is: $CLANG_PATH"
+          echo "The bindgen args are: $BINDGEN_EXTRA_CLANG_ARGS"
+
       - name: Build firmware
         working-directory: rh_sensor
         shell: bash
@@ -37,23 +51,23 @@ jobs:
           if [ "${{ runner.os }}" = "Windows" ]; then
             EXTRA_TWISTER_FLAGS="--short-build-path -O/tmp/twister-out"
           fi
-          if [ "${{ runner.os }}" = "macOS" ]; then
-            echo "Debug output PATH: "
-            echo $PATH
+          # if [ "${{ runner.os }}" = "macOS" ]; then
+          #   echo "Debug output PATH: "
+          #   echo $PATH
 
-            # Find the exact path for macOS 15
-            LLVM_ROOT=$(brew --prefix llvm)
-            echo "LIBCLANG_PATH=$LLVM_ROOT/lib"
-            echo "CLANG_PATH=$LLVM_ROOT/bin/clang"
-            echo "LIBCLANG_PATH=$LLVM_ROOT/lib" >> $GITHUB_ENV
-            echo "CLANG_PATH=$LLVM_ROOT/bin/clang" >> $GITHUB_ENV
+          #   # Find the exact path for macOS 15
+          #   LLVM_ROOT=$(brew --prefix llvm)
+          #   echo "LIBCLANG_PATH=$LLVM_ROOT/lib"
+          #   echo "CLANG_PATH=$LLVM_ROOT/bin/clang"
+          #   echo "LIBCLANG_PATH=$LLVM_ROOT/lib" >> $GITHUB_ENV
+          #   echo "CLANG_PATH=$LLVM_ROOT/bin/clang" >> $GITHUB_ENV
             
-            # Crucial: This tells Bindgen to use the ARM target and fixes the __INT64_C error
-            echo "BINDGEN_EXTRA_CLANG_ARGS=--target=thumbv7em-none-eabi -D__INT64_C(c)=cLL -D__UINT64_C(c)=cULL"
-            echo "BINDGEN_EXTRA_CLANG_ARGS=--target=thumbv7em-none-eabi -D__INT64_C(c)=cLL -D__UINT64_C(c)=cULL" >> $GITHUB_ENV
-            echo "Print GITHUB_ENV:"
-            echo "$GITHUB_ENV"
-          fi
+          #   # Crucial: This tells Bindgen to use the ARM target and fixes the __INT64_C error
+          #   echo "BINDGEN_EXTRA_CLANG_ARGS=--target=thumbv7em-none-eabi -D__INT64_C(c)=cLL -D__UINT64_C(c)=cULL"
+          #   echo "BINDGEN_EXTRA_CLANG_ARGS=--target=thumbv7em-none-eabi -D__INT64_C(c)=cLL -D__UINT64_C(c)=cULL" >> $GITHUB_ENV
+          #   echo "Print GITHUB_ENV:"
+          #   echo "$GITHUB_ENV"
+          # fi
 
           west blobs fetch hal_espressif
           rustup target add thumbv7em-none-eabi
