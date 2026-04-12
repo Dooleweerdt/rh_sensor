@@ -11,6 +11,6 @@ project(app)
 rust_cargo_application()
 
 # Old c-project sources
-#project(app LANGUAGES C)
-#FILE(GLOB app_sources src/*.c)
-#target_sources(app PRIVATE ${app_sources})
+project(app LANGUAGES C)
+FILE(GLOB app_sources src/*.c)
+target_sources(app PRIVATE ${app_sources})

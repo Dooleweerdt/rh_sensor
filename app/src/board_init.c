@@ -16,12 +16,12 @@ LOG_MODULE_REGISTER(board_init, CONFIG_APP_LOG_LEVEL);
 
 int board_init(void)
 {
-	int ret;
-
     printk("Zephyr - RH Sensor in Rust %s\n", STRINGIFY(APP_BUILD_VERSION));
 
     #if CONFIG_WIFI
     #if WIFI_CREDENTIALS
+	int ret;
+
     // Wifi initialization - Test code
     wifi_init();
 
