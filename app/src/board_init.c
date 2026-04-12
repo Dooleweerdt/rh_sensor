@@ -5,6 +5,7 @@
 
 #include <zephyr/init.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/drivers/display.h>
 
 #include <app_version.h>
 
@@ -14,9 +15,23 @@
 
 LOG_MODULE_REGISTER(board_init, CONFIG_APP_LOG_LEVEL);
 
+#define DISPLAY_DRIVER      DT_CHOSEN(zephyr_display)
+const struct device *display_dev = DEVICE_DT_GET(DISPLAY_DRIVER);
+
+
 int board_init(void)
 {
     printk("Zephyr - RH Sensor in Rust %s\n", STRINGIFY(APP_BUILD_VERSION));
+
+    #if CONFIG_DISPLAY
+    if (!device_is_ready(display_dev)) {
+        // Handle error
+        return ENODEV;
+    }
+    // Now you can use display_blanking_off(display_dev) 
+    // and start writing pixels or text.
+    display_blanking_off(display_dev);
+    #endif
 
     #if CONFIG_WIFI
     #if WIFI_CREDENTIALS
