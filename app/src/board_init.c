@@ -34,21 +34,21 @@ int board_init(void)
     // and start writing pixels or text.
     display_blanking_off(display_dev);
 
-    // TODO: failure due to missing k-malloc....
-    // // Initialize the CFB (Character Frame Buffer)
-    // if (cfb_framebuffer_init(display_dev)) {
-    //     return EIO; // Error initializing framebuffer
-    // }
+    //TODO: failure due to missing k-malloc....
+    // Initialize the CFB (Character Frame Buffer)
+    if (cfb_framebuffer_init(display_dev)) {
+        return EIO; // Error initializing framebuffer
+    }
 
-    // // Clear the screen and set font
-    // cfb_framebuffer_clear(display_dev, true);
+    // Clear the screen and set font
+    cfb_framebuffer_clear(display_dev, true);
 
-    // // Print text at coordinates (x, y)
-    // cfb_print(display_dev, "Zephyr RTOS!", 0, 0);
-    // cfb_print(display_dev, "Feather nRF52840", 0, 16);
+    // Print text at coordinates (x, y)
+    cfb_print(display_dev, "Zephyr RTOS!", 0, 0);
+    cfb_print(display_dev, "Feather nRF52840", 0, 16);
 
-    // // Finalize and push the buffer to the hardware
-    // cfb_framebuffer_finalize(display_dev);
+    // Finalize and push the buffer to the hardware
+    cfb_framebuffer_finalize(display_dev);
     #endif
 
     #if CONFIG_WIFI
