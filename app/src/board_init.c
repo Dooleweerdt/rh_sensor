@@ -6,6 +6,7 @@
 #include <zephyr/init.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/drivers/display.h>
+#include <zephyr/display/cfb.h>
 
 #include <app_version.h>
 
@@ -15,9 +16,10 @@
 
 LOG_MODULE_REGISTER(board_init, CONFIG_APP_LOG_LEVEL);
 
+#if CONFIG_DISPLAY
 #define DISPLAY_DRIVER      DT_CHOSEN(zephyr_display)
 const struct device *display_dev = DEVICE_DT_GET(DISPLAY_DRIVER);
-
+#endif
 
 int board_init(void)
 {
@@ -31,6 +33,22 @@ int board_init(void)
     // Now you can use display_blanking_off(display_dev) 
     // and start writing pixels or text.
     display_blanking_off(display_dev);
+
+    // TODO: failure due to missing k-malloc....
+    // // Initialize the CFB (Character Frame Buffer)
+    // if (cfb_framebuffer_init(display_dev)) {
+    //     return EIO; // Error initializing framebuffer
+    // }
+
+    // // Clear the screen and set font
+    // cfb_framebuffer_clear(display_dev, true);
+
+    // // Print text at coordinates (x, y)
+    // cfb_print(display_dev, "Zephyr RTOS!", 0, 0);
+    // cfb_print(display_dev, "Feather nRF52840", 0, 16);
+
+    // // Finalize and push the buffer to the hardware
+    // cfb_framebuffer_finalize(display_dev);
     #endif
 
     #if CONFIG_WIFI
