@@ -16,9 +16,9 @@ manifest:
   projects:
     - name: zephyr
       remote: zephyr-downstream
-      revision: 54ee8ecb
+      # Commit with FLASH issue: revision: 67b5d58c26d6d77c4b36ddc46cfc69e8ee1b080e
       #revision: 3568e1b6d5cdd51a6b964a2a1d6d29200fea2056 #v4.3.0
-      #revision: 684c9e8f32e4373a21098559f748f06915f950c9 #v4.4.0
+      revision: 684c9e8f32e4373a21098559f748f06915f950c9 #v4.4.0
       #revision: main
       import:
         # By using name-allowlist we can clone only the modules that are
