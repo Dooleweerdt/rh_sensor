@@ -16,6 +16,11 @@
 
 LOG_MODULE_REGISTER(board_init, CONFIG_APP_LOG_LEVEL);
 
+#if not WIFI_CREDENTIALS
+#define WIFI_SSID "WirelessNetwork"
+#define WIFI_PSK "Password"
+#endif
+
 #if CONFIG_DISPLAY
 #define DISPLAY_DRIVER      DT_CHOSEN(zephyr_display)
 const struct device *display_dev = DEVICE_DT_GET(DISPLAY_DRIVER);
