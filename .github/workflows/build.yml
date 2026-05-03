@@ -61,9 +61,6 @@ jobs:
           # Replace the wifi_settings file with an empty file as the checked-in version is encrypted
           rm include/app/wifi_settings.h
           touch include/app/wifi_settings.h
-          echo "#define WIFI_CREDENTIALS 1" >> include/app/wifi_settings.h
-          echo "#define WIFI_SSID \"\"" >> include/app/wifi_settings.h
-          echo "#define WIFI_PASSWORD \"\"" >> include/app/wifi_settings.h
           west twister -T app -v --inline-logs --integration $EXTRA_TWISTER_FLAGS
 
       - name: Twister Tests

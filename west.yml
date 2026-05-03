@@ -31,6 +31,7 @@ manifest:
           - tf-psa-crypto
           - hal_nordic # required by the custom_plank board (Nordic based)
           - hal_espressif # required by the esp32 board (Espressif based)
+          - lvgl
 
     - name: mcuboot
       remote: mcuboot-remote
