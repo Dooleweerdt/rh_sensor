@@ -19,10 +19,10 @@ jobs:
         with:
           path: rh_sensor
 
-      # - name: Set up Python
-      #   uses: actions/setup-python@v5
-      #   with:
-      #     python-version: 3.12
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.14
 
       - name: Setup Zephyr project
         uses: zephyrproject-rtos/action-zephyr-setup@v1
@@ -30,21 +30,22 @@ jobs:
           app-path: rh_sensor
           toolchains: arm-zephyr-eabi:riscv64-zephyr-elf
 
-      # - name: Setup macOS LLVM Environment
-      #   if: runner.os == 'macOS'
-      #   run: |
-      #     # Set hardcoded paths for LLVM 20 installed via Homebrew on macOS 26 - fits with GitHub's macOS 26 image
-      #     echo "LIBCLANG_PATH=/opt/homebrew/Cellar/llvm@20/20.0.0/lib/libclang.dylib" >> $GITHUB_ENV
-      #     echo "CLANG_PATH=/opt/homebrew/Cellar/llvm@20/20.0.0/bin/clang" >> $GITHUB_ENV
-      #     # Fix cross-compilation issues with Bindgen by defining the correct macros for 64-bit integer literals
-      #     echo "BINDGEN_EXTRA_CLANG_ARGS=-D__INT64_C(c)=c##LL -D__UINT64_C(c)=c##ULL" >> $GITHUB_ENV
+      - name: Setup macOS LLVM Environment
+        if: runner.os == 'macOS'
+        run: |
+          # Set hardcoded paths for LLVM 20 installed via Homebrew on macOS 26 - fits with GitHub's macOS 26 image
+          LLVM_PREFIX=$(brew --prefix llvm@20)
+          echo "LIBCLANG_PATH=$LLVM_PREFIX/lib/libclang.dylib" >> $GITHUB_ENV
+          echo "CLANG_PATH=$LLVM_PREFIX/bin/clang" >> $GITHUB_ENV
+          # Fix cross-compilation issues with Bindgen by defining the correct macros for 64-bit integer literals
+          echo "BINDGEN_EXTRA_CLANG_ARGS=-D__INT64_C(c)=c##LL -D__UINT64_C(c)=c##ULL" >> $GITHUB_ENV
 
-      # - name: Verify Environment
-      #   if: runner.os == 'macOS'
-      #   run: |
-      #     echo "The clang path is: $CLANG_PATH"
-      #     echo "The libclang path is: $LIBCLANG_PATH"
-      #     echo "The bindgen args are: $BINDGEN_EXTRA_CLANG_ARGS"
+      - name: Verify Environment
+        if: runner.os == 'macOS'
+        run: |
+          echo "The clang path is: $CLANG_PATH"
+          echo "The libclang path is: $LIBCLANG_PATH"
+          echo "The bindgen args are: $BINDGEN_EXTRA_CLANG_ARGS"
 
       - name: Build firmware
         working-directory: rh_sensor
