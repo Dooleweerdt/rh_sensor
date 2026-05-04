@@ -74,7 +74,7 @@ int board_init(void)
     #endif // CONFIG_DISPLAY
 
     #if CONFIG_WIFI
-    #if WIFI_CREDENTIALS
+    #if WIFI_SSID
 	int ret;
 
     // Wifi initialization - Test code
