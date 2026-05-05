@@ -17,6 +17,8 @@
 LOG_MODULE_REGISTER(board_init, CONFIG_APP_LOG_LEVEL);
 
 #ifndef WIFI_CREDENTIALS
+// Pseudo credentials for testing - real credentials is in wifi_settings.h
+#define WIFI_CREDENTIALS 1
 #define WIFI_SSID "WirelessNetwork"
 #define WIFI_PSK "Password"
 #endif
@@ -74,7 +76,7 @@ int board_init(void)
     #endif // CONFIG_DISPLAY
 
     #if CONFIG_WIFI
-    #if WIFI_SSID
+    #if WIFI_CREDENTIALS
 	int ret;
 
     // Wifi initialization - Test code
