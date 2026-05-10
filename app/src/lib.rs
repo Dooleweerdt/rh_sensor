@@ -9,6 +9,7 @@
 #![allow(unexpected_cfgs)]
 
 mod driver;
+mod sensor_init;
 
 use log::info;
 use zephyr::raw::ZR_GPIO_OUTPUT_ACTIVE;

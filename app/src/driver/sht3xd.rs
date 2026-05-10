@@ -1,25 +1,16 @@
-use core::ffi::CStr;
-use zephyr_sys::{device, device_get_binding, device_is_ready, 
-                sensor_sample_fetch, sensor_channel_get, sensor_value,
-                sensor_channel_SENSOR_CHAN_AMBIENT_TEMP, sensor_channel_SENSOR_CHAN_HUMIDITY};
+use zephyr_sys::{sensor_sample_fetch, sensor_channel_get, sensor_value,
+                 sensor_channel_SENSOR_CHAN_AMBIENT_TEMP, sensor_channel_SENSOR_CHAN_HUMIDITY};
 
 use log::info;
+use crate::sensor_init::check_sensor_ready;
 
 pub fn read_sensor_example() {
     unsafe {
-        let sensor_label = CStr::from_bytes_with_nul(b"sht3xd@45\0").unwrap();
-        let dev: *const device = device_get_binding(sensor_label.as_ptr());
+        let dev = check_sensor_ready();
 
         if dev.is_null() {
             info!("Error: Device not found!");
             return;
-        }
-
-        if device_is_ready(dev) {
-            info!("SHT3Xd ready!");
-        }
-        else {
-            info!("SHT3Xd is NOT ready");
         }
 
         loop {
