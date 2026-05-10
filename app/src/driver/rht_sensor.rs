@@ -2,7 +2,7 @@ use zephyr_sys::{sensor_sample_fetch, sensor_channel_get, sensor_value,
                  sensor_channel_SENSOR_CHAN_AMBIENT_TEMP, sensor_channel_SENSOR_CHAN_HUMIDITY};
 
 use log::info;
-use crate::sensor_init::check_sensor_ready;
+use crate::rht_sensor_init::check_sensor_ready;
 
 pub fn read_sensor_example() {
     unsafe {

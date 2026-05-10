@@ -9,13 +9,13 @@
 #![allow(unexpected_cfgs)]
 
 mod driver;
-mod sensor_init;
+mod rht_sensor_init;
 
 use log::info;
 use zephyr::raw::ZR_GPIO_OUTPUT_ACTIVE;
 use zephyr::time::{sleep, Duration};
 
-use driver::sht3xd::read_sensor_example;
+use driver::rht_sensor::read_sensor_example;
 
 #[unsafe(no_mangle)]
 extern "C" fn rust_main() {

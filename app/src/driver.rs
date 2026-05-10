@@ -1,1 +1,1 @@
-pub mod sht3xd;
+pub mod rht_sensor;

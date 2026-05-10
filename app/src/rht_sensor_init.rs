@@ -8,7 +8,7 @@ unsafe extern "C" {
 
 pub fn check_sensor_ready() -> *const device {
     unsafe {
-        let dev = crate::sensor_init::is_sensor_ready();
+        let dev = crate::rht_sensor_init::is_sensor_ready();
         if dev.is_null() {
             info!("Sensor is NOT ready for Rust");
             return core::ptr::null();

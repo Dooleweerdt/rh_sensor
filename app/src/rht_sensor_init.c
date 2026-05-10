@@ -8,6 +8,7 @@ const struct device * is_sensor_ready(void)
 {
     static const struct device *sensor;
 
+    // Auto-select the SHT3x sensor, or use the example_sensor for debugging/development
     sensor = DEVICE_DT_GET(DT_NODELABEL(sht3xd));
 	if (!device_is_ready(sensor)) {
 		LOG_ERR("SHT3x sensor is not ready");
@@ -22,7 +23,7 @@ const struct device * is_sensor_ready(void)
         }
     }
 
-    LOG_INF("Sensor device: %s", sensor->name);
+    LOG_INF("Sensor device selected: %s", sensor->name);
 
     if (sensor == NULL) {
         return NULL;
