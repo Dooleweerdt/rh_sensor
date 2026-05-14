@@ -112,8 +112,6 @@
 
 	w1_0: w1-zephyr-serial-0 {
 		compatible = "zephyr,w1-serial";
-		#address-cells = <1>;
-		#size-cells = <0>;
 		status = "okay";
 
 		ds18b20 {

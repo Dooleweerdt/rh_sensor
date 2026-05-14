@@ -36,6 +36,20 @@
 		};
 	};
 
+    /* Define the 1-Wire bus at the root level */
+    w1: w1 {
+        compatible = "zephyr,w1-gpio";
+        /* Pick an available GPIO, e.g., GPIO 4 */
+        gpios = <&gpio0 4 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
+        status = "okay";
+
+        ds18b20: ds18b20 {
+            compatible = "maxim,ds18b20";
+            family-code = <0x28>;
+            resolution = <12>;
+            status = "okay";
+        };
+    };
 
 	chosen {
 		zephyr,console = &usb_serial;
