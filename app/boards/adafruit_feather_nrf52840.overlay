@@ -91,3 +91,36 @@
 		prechargep = <0x22>;
 	};
 };
+
+&pinctrl {
+	uart1_default: uart1_default {
+		group1 {
+			psels = <NRF_PSEL(UART_RX, 1, 1)>;
+			bias-pull-up;
+		};
+
+		group2 {
+			psels = <NRF_PSEL(UART_TX, 1, 2)>;
+			/* max. 5mA drive strength: */
+			nordic,drive-mode = <NRF_DRIVE_H0D1>;
+		};
+	};
+};
+
+&feather_serial {
+	status = "okay";
+
+	w1_0: w1-zephyr-serial-0 {
+		compatible = "zephyr,w1-serial";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		status = "okay";
+
+		ds18b20 {
+			compatible = "maxim,ds18b20";
+			family-code = <0x28>;
+			resolution = <12>;
+			status = "okay";
+		};
+	};
+};

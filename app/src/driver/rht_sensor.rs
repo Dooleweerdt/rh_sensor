@@ -2,7 +2,6 @@ use zephyr_sys::{sensor_sample_fetch, sensor_channel_get, sensor_value,
                  sensor_channel_SENSOR_CHAN_AMBIENT_TEMP, sensor_channel_SENSOR_CHAN_HUMIDITY};
 
 use log::info;
-use crate::rht_sensor_init::check_sensor_ready;
 
 // Defines the physical quantities the sensors can measure
 #[repr(u32)] // Ensures this enum is stored as a 32-bit unsigned integer
@@ -21,14 +20,18 @@ pub (crate) struct RhtSensor {
 }
 
 impl RhtSensor {
-    pub fn init(&mut self) -> bool {
-        self.dev = check_sensor_ready();
-
-        if self.dev.is_null() {
-            info!("Error: Device not found!");
-            return false;
+/// Creates a new sensor instance with specific capabilities
+    pub fn new(
+        dev: *const zephyr_sys::device, 
+        name: &'static str, 
+        capabilities: &'static [SensorChannel]
+    ) -> Option<Self> {
+        // Validation: If Zephyr couldn't find the device, don't create the object
+        if dev.is_null() {
+            return None;
         }
-        return true;
+
+        Some(Self {dev, name, capabilities})
     }
 
     pub fn read_data(&mut self, channel: SensorChannel) -> Result<f32, i32> {

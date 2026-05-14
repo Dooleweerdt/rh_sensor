@@ -10,7 +10,7 @@ find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(app)
 rust_cargo_application()
 
-# Old c-project sources
+# Add c-project sources
 project(app LANGUAGES C)
-FILE(GLOB app_sources src/*.c)
+FILE(GLOB app_sources src/*.c, c_src/*.c)
 target_sources(app PRIVATE ${app_sources})

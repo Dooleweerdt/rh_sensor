@@ -9,14 +9,23 @@
 #![allow(unexpected_cfgs)]
 
 mod driver;
-mod rht_sensor_init;
+extern crate alloc;
 
 use log::info;
 use zephyr::raw::ZR_GPIO_OUTPUT_ACTIVE;
 use zephyr::time::{sleep, Duration};
+use zephyr_sys::device;
+use alloc::vec::Vec;
 
 use driver::rht_sensor::RhtSensor;
 use driver::rht_sensor::SensorChannel;
+
+// Use Rust pointer syntax - not C style!
+unsafe extern "C" {
+    fn get_sht3x_device() -> *const device;
+    fn get_ds18b20_device() -> *const device;
+    fn get_demo_sensor_device() -> *const device;
+}
 
 #[unsafe(no_mangle)]
 extern "C" fn rust_main() {
@@ -43,15 +52,22 @@ fn do_blink() {
     led0.configure(ZR_GPIO_OUTPUT_ACTIVE);
     let duration = Duration::millis_at_least(1000);
 
-    let sht3x = RhtSensor { dev: core::ptr::null(), name: "SHT3X", capabilities: &[SensorChannel::Temperature, SensorChannel::Humidity] };
-    let ds18b20 = RhtSensor { dev: core::ptr::null(), name: "DS18B20", capabilities: &[SensorChannel::Temperature] };
+    // Create a "List" of different sensors (Trait Objects)
+    let mut sensors = Vec::new();
 
-    // A "List" of different sensors (Trait Objects)
-    // This is the equivalent of a List<IRhtSensor> in C#
-    let mut sensors = [sht3x, ds18b20];
+    unsafe {
+        if let Some(sht3x) = RhtSensor::new(get_sht3x_device(), "SHT3X", &[SensorChannel::Temperature, SensorChannel::Humidity]) {
+            sensors.push(sht3x);
+        }
+        if let Some(ds18b20) = RhtSensor::new(get_ds18b20_device(), "DS18B20", &[SensorChannel::Temperature]) {
+            sensors.push(ds18b20);
+        }
 
-    for s in &mut sensors {
-        s.init();
+        if sensors.is_empty() {
+            if let Some(demo_sensor) = RhtSensor::new(get_demo_sensor_device(), "Mock Sensor", &[SensorChannel::Temperature, SensorChannel::Humidity]) {
+                sensors.push(demo_sensor);
+            }
+        }
     }
 
     loop {
