@@ -8,14 +8,15 @@
 // build.  So, this is just always necessary.
 #![allow(unexpected_cfgs)]
 
-mod rht_sensor;
+mod driver;
 mod rht_sensor_init;
 
 use log::info;
 use zephyr::raw::ZR_GPIO_OUTPUT_ACTIVE;
 use zephyr::time::{sleep, Duration};
 
-use crate::rht_sensor::{RhtSensor, sht3x::Sht3x, onewire::OneWire};
+use driver::rht_sensor::RhtSensor;
+use driver::rht_sensor::SensorChannel;
 
 #[unsafe(no_mangle)]
 extern "C" fn rust_main() {
@@ -36,32 +37,33 @@ fn do_blink() {
 
     if !led0.is_ready() {
         info!("LED is not ready");
-        loop {}
+        loop {};
     }
 
     led0.configure(ZR_GPIO_OUTPUT_ACTIVE);
     let duration = Duration::millis_at_least(1000);
 
-    let mut s1 = Sht3x { dev: core::ptr::null() };
-    let mut s2 = OneWire { dev: core::ptr::null() };
+    let sht3x = RhtSensor { dev: core::ptr::null(), name: "SHT3X", capabilities: &[SensorChannel::Temperature, SensorChannel::Humidity] };
+    let ds18b20 = RhtSensor { dev: core::ptr::null(), name: "DS18B20", capabilities: &[SensorChannel::Temperature] };
 
     // A "List" of different sensors (Trait Objects)
     // This is the equivalent of a List<IRhtSensor> in C#
-    let sensors: &mut [&mut dyn RhtSensor] = &mut [&mut s1, &mut s2];    
+    let mut sensors = [sht3x, ds18b20];
 
-    for s in &mut *sensors {
-        s.init().unwrap();
+    for s in &mut sensors {
+        s.init();
     }
 
     loop {
         led0.toggle_pin();
 
-        for s in &mut *sensors {
-            let (temp, hum) = s.read_data().unwrap();
-            //info!("s: {}:  Temperature: {} C, Humidity: {} %%", s, temp, hum);
-            info!(" - - - - ");
-            info!("Temperature: {} C", temp);
-            info!("Humidity: {} %%", hum);
+        for s in &mut sensors {
+            if let Ok(t) = s.read_data(SensorChannel::Temperature) {
+                info!("{} Temperature: {} C", s.name, t);
+            }
+            if let Ok(h) = s.read_data(SensorChannel::Humidity) {
+                info!("{} Humidity: {} %%", s.name, h);
+            }
         }
 
         sleep(duration);

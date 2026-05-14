@@ -21,10 +21,8 @@ pub (crate) struct RhtSensor {
 }
 
 impl RhtSensor {
-    pub fn init(&self) -> bool {
-        unsafe {
-            self.dev = check_sensor_ready();
-        }
+    pub fn init(&mut self) -> bool {
+        self.dev = check_sensor_ready();
 
         if self.dev.is_null() {
             info!("Error: Device not found!");
@@ -34,15 +32,15 @@ impl RhtSensor {
     }
 
     pub fn read_data(&mut self, channel: SensorChannel) -> Result<f32, i32> {
-        let mut val = core::mem::zeroed::<sensor_value>();
+        let mut val = sensor_value { val1: 0, val2: 0 };
 
         if !self.capabilities.contains(&channel) {
             return Err(-1); // Or a specific "Unsupported" error
         }
 
         let zephyr_chan = match channel {
-            SensorChannel::Temperature => zephyr_sys::sensor_channel_SENSOR_CHAN_AMBIENT_TEMP,
-            SensorChannel::Humidity => zephyr_sys::sensor_channel_SENSOR_CHAN_HUMIDITY,
+            SensorChannel::Temperature => sensor_channel_SENSOR_CHAN_AMBIENT_TEMP,
+            SensorChannel::Humidity => sensor_channel_SENSOR_CHAN_HUMIDITY,
         };
 
         unsafe {
