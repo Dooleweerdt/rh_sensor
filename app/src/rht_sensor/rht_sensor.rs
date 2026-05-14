@@ -4,40 +4,64 @@ use zephyr_sys::{sensor_sample_fetch, sensor_channel_get, sensor_value,
 use log::info;
 use crate::rht_sensor_init::check_sensor_ready;
 
-pub fn read_sensor_example() {
-    unsafe {
-        let dev = check_sensor_ready();
+// Defines the physical quantities the sensors can measure
+#[repr(u32)] // Ensures this enum is stored as a 32-bit unsigned integer
+#[derive(Copy, Clone, PartialEq, Debug)]
+pub enum SensorChannel {
+    Temperature = 0,
+    Humidity = 1,
+    // Add more later: Pressure, CO2, etc.
+}
 
-        if dev.is_null() {
-            info!("Error: Device not found!");
-            return;
+/// The common Sensor struct
+pub (crate) struct RhtSensor {
+    pub dev: *const zephyr_sys::device,
+    pub name: &'static str,
+    pub capabilities: &'static [SensorChannel],
+}
+
+impl RhtSensor {
+    pub fn init(&self) -> bool {
+        unsafe {
+            self.dev = check_sensor_ready();
         }
 
-        loop {
-            let ret = sensor_sample_fetch(dev);
+        if self.dev.is_null() {
+            info!("Error: Device not found!");
+            return false;
+        }
+        return true;
+    }
+
+    pub fn read_data(&mut self, channel: SensorChannel) -> Result<f32, i32> {
+        let mut val = core::mem::zeroed::<sensor_value>();
+
+        if !self.capabilities.contains(&channel) {
+            return Err(-1); // Or a specific "Unsupported" error
+        }
+
+        let zephyr_chan = match channel {
+            SensorChannel::Temperature => zephyr_sys::sensor_channel_SENSOR_CHAN_AMBIENT_TEMP,
+            SensorChannel::Humidity => zephyr_sys::sensor_channel_SENSOR_CHAN_HUMIDITY,
+        };
+
+        unsafe {
+            let ret = sensor_sample_fetch(self.dev);
             if ret != 0 {
                 info!("Error fetching sensor sample: {}", ret);
-                return;
+                return Err(ret);
             }
 
-            let mut temperature = sensor_value { val1: 0, val2: 0 };
-            let mut humidity = sensor_value { val1: 0, val2: 0 };
-            let ret = sensor_channel_get(dev, sensor_channel_SENSOR_CHAN_AMBIENT_TEMP, &mut temperature);
+            let ret = sensor_channel_get(self.dev, zephyr_chan, &mut val);
             if ret != 0 {
-                info!("Error getting temperature: {}", ret);
-                return;
+                info!("Error getting sensor data: {}", ret);
+                return Err(ret);
             }
 
-            let ret = sensor_channel_get(dev, sensor_channel_SENSOR_CHAN_HUMIDITY as u32, &mut humidity);
-            if ret != 0 {
-                info!("Error getting humidity: {}", ret);
-                return;
-            }
-            info!(" - - - - ");
-            info!("Temperature: {}.{} C", temperature.val1, temperature.val2);
-            info!("Humidity: {}.{} %%", humidity.val1, humidity.val2);
-
-            zephyr::time::sleep(zephyr::time::Duration::secs_at_least(5));
         }
+        info!(" - - - - ");
+        info!("Sensor: {}", self.name);
+        info!("Sensor reading: {}.{} %%", val.val1, val.val2);
+        Ok(val.val1 as f32 + val.val2 as f32 / 100.0)
     }
 }
