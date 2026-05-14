@@ -57,9 +57,9 @@ impl RhtSensor {
             }
 
         }
-        info!(" - - - - ");
-        info!("Sensor: {}", self.name);
-        info!("Sensor reading: {}.{} %%", val.val1, val.val2);
-        Ok(val.val1 as f32 + val.val2 as f32 / 100.0)
+        // info!(" - - - - ");
+        // info!("Sensor: {}", self.name);
+        // info!("Sensor reading: {}.{} %%", val.val1, val.val2);
+        Ok(val.val1 as f32 + (val.val2 as f32 / 1_000_000.0))
     }
 }
