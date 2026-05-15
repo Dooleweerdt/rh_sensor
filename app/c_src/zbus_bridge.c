@@ -13,7 +13,6 @@ ZBUS_LISTENER_DEFINE(display_sub, display_cb);
 ZBUS_CHAN_DEFINE(sensor_data_channel, struct sensor_msg, NULL, NULL, ZBUS_OBSERVERS(wifi_sub, display_sub), ZBUS_MSG_INIT(0));
 
 // Simple function for Rust to call
-int zbus_bridge_publish_rht(float t, float h) {
-    struct sensor_msg msg = { .temp = t, .hum = h };
-    return zbus_chan_pub(&sensor_data_channel, &msg, K_MSEC(100));
+int zbus_bridge_publish_rht(struct sensor_msg *msg) {
+    return zbus_chan_pub(&sensor_data_channel, msg, K_MSEC(100));
 }

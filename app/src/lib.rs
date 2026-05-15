@@ -25,13 +25,27 @@ unsafe extern "C" {
     fn get_sht3x_device() -> *const device;
     fn get_ds18b20_device() -> *const device;
     fn get_demo_sensor_device() -> *const device;
-    fn zbus_bridge_publish_rht(t: f32, h: f32) -> i32;
+    fn zbus_bridge_publish_rht(msg: *const SensorMsg) -> i32;
+}
+
+// TODO: Move to application.rs
+#[repr(u32)] // Force it to be the size of a C 'int'
+pub enum SensorId {
+    Sht3x = 0,
+    OneWire = 1,
+    Mock = 2,
+}
+#[repr(C)] // Essential: tells Rust not to reorder these fields
+pub struct SensorMsg {
+    pub source: SensorId,
+    pub temp: f32,
+    pub hum: f32,
 }
 
 // Todo: Move to application.rs
-pub fn broadcast_data(t: f32, h: f32) {
+pub fn broadcast_data(msg: *const SensorMsg) {
     unsafe {
-        zbus_bridge_publish_rht(t, h);
+        zbus_bridge_publish_rht(msg);
     }
 }
 
@@ -82,20 +96,21 @@ fn do_blink() {
     loop {
         led0.toggle_pin();
 
-        let mut sensor_data = Vec::new();
-
         for s in &mut sensors {
+            let id = match s.name {"SHT3x" => SensorId::Sht3x, "DS18B20" => SensorId::OneWire, _ => SensorId::Mock};
+            let mut sensor_data = SensorMsg { source: id, temp: 0.0, hum: 0.0 };
+
             if let Ok(t) = s.read_data(SensorChannel::Temperature) {
                 info!("{} Temperature: {} C", s.name, t);
-                sensor_data.push(t);
+                sensor_data.temp = t;
             }
             if let Ok(h) = s.read_data(SensorChannel::Humidity) {
                 info!("{} Humidity: {} %%", s.name, h);
-                sensor_data.push(h);
+                sensor_data.hum = h;
             }
 
             // Send data on zbus to subscribers (wifi, display, etc.)
-            broadcast_data(sensor_data[0], sensor_data[1]);
+            broadcast_data(&sensor_data);
         }
 
         sleep(duration);
