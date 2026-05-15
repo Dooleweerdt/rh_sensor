@@ -12,5 +12,5 @@ rust_cargo_application()
 
 # Add c-project sources
 project(app LANGUAGES C)
-FILE(GLOB app_sources src/*.c, c_src/*.c)
+FILE(GLOB app_sources c_src/*.c)
 target_sources(app PRIVATE ${app_sources})
