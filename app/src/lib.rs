@@ -29,15 +29,13 @@ unsafe extern "C" {
 }
 
 // TODO: Move to application.rs
-#[repr(u32)] // Force it to be the size of a C 'int'
-pub enum SensorId {
-    Sht3x = 0,
-    OneWire = 1,
-    Mock = 2,
-}
+pub const ID_SHT3X: u32 = 0;
+pub const ID_ONEWIRE: u32 = 1;
+pub const ID_MOCK: u32 = 2;
+
 #[repr(C)] // Essential: tells Rust not to reorder these fields
 pub struct SensorMsg {
-    pub source: SensorId,
+    pub source: u32,
     pub temp: f32,
     pub hum: f32,
 }
@@ -97,7 +95,7 @@ fn do_blink() {
         led0.toggle_pin();
 
         for s in &mut sensors {
-            let id = match s.name {"SHT3x" => SensorId::Sht3x, "DS18B20" => SensorId::OneWire, _ => SensorId::Mock};
+            let id = match s.name {"SHT3x" => ID_SHT3X, "DS18B20" => ID_ONEWIRE, _ => ID_MOCK};
             let mut sensor_data = SensorMsg { source: id, temp: 0.0, hum: 0.0 };
 
             if let Ok(t) = s.read_data(SensorChannel::Temperature) {
