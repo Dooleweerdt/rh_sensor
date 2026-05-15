@@ -25,6 +25,14 @@ unsafe extern "C" {
     fn get_sht3x_device() -> *const device;
     fn get_ds18b20_device() -> *const device;
     fn get_demo_sensor_device() -> *const device;
+    fn zbus_bridge_publish_rht(t: f32, h: f32) -> i32;
+}
+
+// Todo: Move to application.rs
+pub fn broadcast_data(t: f32, h: f32) {
+    unsafe {
+        zbus_bridge_publish_rht(t, h);
+    }
 }
 
 #[unsafe(no_mangle)]
@@ -70,16 +78,24 @@ fn do_blink() {
         }
     }
 
+    // TODO: Move to application.rs
     loop {
         led0.toggle_pin();
+
+        let mut sensor_data = Vec::new();
 
         for s in &mut sensors {
             if let Ok(t) = s.read_data(SensorChannel::Temperature) {
                 info!("{} Temperature: {} C", s.name, t);
+                sensor_data.push(t);
             }
             if let Ok(h) = s.read_data(SensorChannel::Humidity) {
                 info!("{} Humidity: {} %%", s.name, h);
+                sensor_data.push(h);
             }
+
+            // Send data on zbus to subscribers (wifi, display, etc.)
+            broadcast_data(sensor_data[0], sensor_data[1]);
         }
 
         sleep(duration);
