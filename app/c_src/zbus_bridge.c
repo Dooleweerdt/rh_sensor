@@ -1,18 +1,34 @@
 #include <zephyr/zbus/zbus.h>
 #include "app/sensor_data.h"
 
-// 1. Stub the callback functions (even if they do nothing for now)
-static void wifi_cb(const struct zbus_channel *chan) { /* Wakes up Rust thread */ }
-static void display_cb(const struct zbus_channel *chan) { /* Updates display */ }
-
-// 2. Define the listeners
-ZBUS_LISTENER_DEFINE(wifi_sub, wifi_cb);
-ZBUS_LISTENER_DEFINE(display_sub, display_cb);
+// Define the zbus subscribers here:
+ZBUS_SUBSCRIBER_DEFINE(wifi_sub, 1);
+ZBUS_SUBSCRIBER_DEFINE(display_sub, 1);
 
 // C handles the complex Zbus channel definition
 ZBUS_CHAN_DEFINE(sensor_data_channel, struct sensor_msg, NULL, NULL, ZBUS_OBSERVERS(wifi_sub, display_sub), ZBUS_MSG_INIT(0));
 
-// Simple function for Rust to call
+// Publish function from Rust
 int zbus_bridge_publish_rht(struct sensor_msg *msg) {
     return zbus_chan_pub(&sensor_data_channel, msg, K_MSEC(100));
 }
+
+// Subscribe: Wait and read function from Rust
+int zbus_bridge_wait_read(const struct zbus_observer *sub, 
+                         const struct zbus_channel **chan,
+                         struct sensor_msg *msg) {
+    return zbus_sub_wait_msg(sub, chan, msg, K_FOREVER);
+}
+
+// // Subscribe: Read function from Rust
+// int zbus_bridge_read(struct sensor_msg *msg) {
+//     const struct zbus_channel *chan;
+//     int ret = zbus_sub_read(&wifi_sub, &chan, msg, K_NO_WAIT);
+//     if (ret == 0) {
+//         // Successfully read the message
+//         return 0;
+//     }
+
+//     // Handle error (e.g., timeout or no message)
+//     return ret;
+// }

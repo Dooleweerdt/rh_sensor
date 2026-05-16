@@ -10,6 +10,7 @@
 
 mod driver;
 mod application;
+mod comm;
 extern crate alloc;
 
 use log::info;
@@ -19,6 +20,7 @@ use alloc::vec::Vec;
 
 use driver::rht_sensor::RhtSensor;
 use driver::rht_sensor::SensorChannel;
+use comm::comm_thread;
 
 // Use Rust pointer syntax - not C style!
 unsafe extern "C" {
@@ -70,6 +72,7 @@ fn do_blink() {
         }
     }
 
+    let _comm_thread = comm_thread().start();
     application::start(led0, sensors);
 }
 
