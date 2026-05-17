@@ -19,16 +19,3 @@ int zbus_bridge_wait_read(const struct zbus_observer *sub,
                          struct sensor_msg *msg) {
     return zbus_sub_wait_msg(sub, chan, msg, K_FOREVER);
 }
-
-// // Subscribe: Read function from Rust
-// int zbus_bridge_read(struct sensor_msg *msg) {
-//     const struct zbus_channel *chan;
-//     int ret = zbus_sub_read(&wifi_sub, &chan, msg, K_NO_WAIT);
-//     if (ret == 0) {
-//         // Successfully read the message
-//         return 0;
-//     }
-
-//     // Handle error (e.g., timeout or no message)
-//     return ret;
-// }

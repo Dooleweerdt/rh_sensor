@@ -15,7 +15,8 @@ pub const ID_SHT3X: u32 = 0;
 pub const ID_ONEWIRE: u32 = 1;
 pub const ID_MOCK: u32 = 2;
 
-#[repr(C)] // Essential: tells Rust not to reorder these fields
+#[repr(C)]
+#[derive(Default, Clone, Copy)]
 pub struct SensorMsg {
     pub source: u32,
     pub temp: f32,
