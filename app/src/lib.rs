@@ -72,7 +72,9 @@ fn do_blink() {
         }
     }
 
-    let _comm_thread = comm_thread().start();
+    let _comm_thread = comm_thread();
+    _comm_thread.set_priority(10);
+    _comm_thread.start();
     application::start(led0, sensors);
 }
 

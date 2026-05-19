@@ -16,7 +16,7 @@ pub const ID_ONEWIRE: u32 = 1;
 pub const ID_MOCK: u32 = 2;
 
 #[repr(C)]
-#[derive(Default, Clone, Copy)]
+#[derive(Default, Debug, Clone, Copy)]
 pub struct SensorMsg {
     pub source: u32,
     pub temp: f32,

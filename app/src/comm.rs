@@ -12,7 +12,7 @@ pub fn get_sub_ptr() -> *const core::ffi::c_void {
     unsafe { &wifi_sub as *const _ }
 }
 
-#[zephyr::thread(stack_size = 2048)]
+#[zephyr::thread(stack_size = 8192)]
 pub fn comm_thread() {
     let mut msg = SensorMsg { source: 0, temp: 0.0, hum: 0.0 };
 
