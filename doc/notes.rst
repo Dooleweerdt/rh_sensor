@@ -55,3 +55,21 @@ In build.rs add:
     .allowlist_function("sensor\_.*")
     .allowlist_item("SENSOR\_.*")
 
+
+----------------
+
+Another option to access Zephyr API's are to manually map them:
+
+.. code-block:: c
+
+    int zbus_bridge_publish_rht(struct sensor_msg *msg) {
+        return zbus_chan_pub(&sensor_data_channel, msg, K_NO_WAIT);
+    }
+
+
+.. code-block:: rust
+
+    unsafe extern "C" {
+        fn zbus_bridge_publish_rht(msg: *const SensorMsg) -> i32;
+    }
+

@@ -9,6 +9,7 @@ This is a simple Sphinx documentation setup for ``RH Sensor in Rust``.
 
    app_overview
    zephyr
+   openocd
    notes
 
 
