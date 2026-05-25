@@ -19,7 +19,7 @@ The essential changes and notes are:
 * The default ``west flash`` and ``west debugserver`` for flashing and debugging does not work with the ESP32C3.
 
     * ``OPENOCD`` and ``OPENOCD_DEFAULT_PATH`` symbols should be added to all west commands... (currently added to build...)
-    * *Flashing currently fails due to a wrong interface file - this may be fixable in the future...
+    * *Flashing currently fails due to a wrong interface file - this may be fixable in the future...*
 
 * The ``esp appimage_offset 0xyyyyy`` parameter is essential to map flash instructions to the internal address space for the ESP32C3.
 
