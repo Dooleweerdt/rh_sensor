@@ -12,6 +12,7 @@ Additional guidance for Zephyr and ESP32 MCU's can be found in these links:
 `Zephyr OpenOCD guide: <https://docs.zephyrproject.org/latest/boards/espressif/common/openocd-debugging.html>`_
 
 The essential changes and notes are:
+
 * The default ``west flash`` and ``west debugserver`` for flashing and debugging does not work with the ESP32C3.
 * The ``esp appimage_offset 0xyyyyy`` parameter is essential to map flash instructions to the internal address space for the ESP32C3.
 
@@ -24,7 +25,7 @@ The essential changes and notes are:
 The VSCode OpenOCD launch configuration in use looks like this:
 
 .. code-block:: json
-    
+
     {
         "name": "Debug ESP32-C3",
         "type": "cppdbg",
@@ -62,5 +63,6 @@ The VSCode OpenOCD launch configuration in use looks like this:
 Note the difference in setupCommmands, as this will use target extended-remode vs. the miDebugger call above which uses the old remote command.
 
 Flash script and start debugserver scripts can be found here:
+
 * Flash script: ``app/scripts/flashtarget.sh``
 * Start debugserver script: ``app/scripts/start_debugserver.sh``
