@@ -22,7 +22,9 @@ The essential changes and notes are:
 * The ESP32C3 needs a cache flush after connect, to align OpenOCD and internal states.
 
 The VSCode OpenOCD launch configuration in use looks like this:
+
 .. code-block:: json
+    
     {
         "name": "Debug ESP32-C3",
         "type": "cppdbg",
