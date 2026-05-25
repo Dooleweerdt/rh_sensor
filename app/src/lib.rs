@@ -22,6 +22,9 @@ use driver::rht_sensor::RhtSensor;
 use driver::rht_sensor::SensorChannel;
 use comm::comm_thread;
 
+#[cfg(not(dt = "aliases::led0"))]
+use zephyr::time::{sleep, Duration};
+
 // Use Rust pointer syntax - not C style!
 unsafe extern "C" {
     fn get_sht3x_device() -> *const device;

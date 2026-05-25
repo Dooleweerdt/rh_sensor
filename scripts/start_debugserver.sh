@@ -15,6 +15,6 @@ openocd \
   -c 'gdb port 3333' \
   -c "init" \
   -c "halt" \
-  -c "esp appimage_offset 0x20000" \
+  -c "esp appimage_offset 0x20000"
 #  -c "esp32c3 configure -event gdb-attach { halt; reset halt; }" \
 #  -c "esp32c3 configure -event gdb-detach { reset run; }"

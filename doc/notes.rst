@@ -13,7 +13,7 @@ Update west.yml to include module for zephyr-lang-rust:
       remote: zephyrproject-rtos
 
 
-Additionally the clang compiler is required - if you see this error during build:
+Additionally the clang compiler is required for bindgen - if you see this error during build:
 
 .. code-block:: text
 
@@ -58,7 +58,7 @@ In build.rs add:
 
 ----------------
 
-Another option to access Zephyr API's are to manually map them:
+Another option to access Zephyr API's are to manually map them instead of using bindgen:
 
 .. code-block:: c
 
