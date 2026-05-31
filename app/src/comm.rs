@@ -1,6 +1,7 @@
 use crate::application::SensorMsg;
-use zephyr::thread;
-use core::ffi::c_void;
+use zephyr::thread::{ThreadData, ThreadStack, ReadyThread};
+use core::ffi::{c_void, CStr};
+use core::ptr::addr_of_mut;
 use log::info;
 
 unsafe extern "C" {
@@ -38,26 +39,16 @@ impl <T: DataTransport + 'static + ?Sized> CommInterface<T>
     }
 
     pub fn run(&mut self) {
-        // let transport = unsafe {
-        //     match &mut TRANSPORT {
-        //         Some(t) => t,
-        //         None => {
-        //             // If init() was not called before the scheduler woke the thread, freeze
-        //             panic!("Communication background thread initialized without a mapped data route!");
-        //         }
-        //     }
-        // };    
         let mut msg = SensorMsg { source: 0, temp: 0.0, hum: 0.0 };
 
         log::info!("Communication thread started (Wi-Fi/BT ready)");
         
-        // We need a pointer to hold which channel woke us up 
-        // (useful if one listener observes multiple channels)
+        // Create a pointer to hold which channel woke us up 
         let mut chan_ptr: *const c_void = core::ptr::null();
 
         loop {
             // This blocks the thread. No semaphore needed!
-            // It specifically waits for the 'wifi_lis' subscriber defined in C.
+            // - It specifically waits for the 'wifi_lis' subscriber defined in C.
             let ret = unsafe { zbus_bridge_wait_read(get_sub_ptr(), &mut chan_ptr, &mut msg) };
 
             if ret == 0 {
@@ -77,39 +68,57 @@ impl <T: DataTransport + 'static + ?Sized> CommInterface<T>
     }
 }
 
-// Allocate a static workspace buffer block for the thread's stack. 
-// Zephyr requires this memory to be statically reserved.
-static mut COMM_THREAD_STACK: [u8; 4096] = [0; 4096];
-static mut COMM_THREAD_DATA: Option<CommInterface<dyn DataTransport>> = None;
+// Allocate the Zephyr thread's stack and a single thread pool structure. 
+const STACK_SIZE: usize = 4096;
+static COMM_THREAD_STACK: ThreadStack<STACK_SIZE> = ThreadStack::new();
+static COMM_THREAD_POOL: [ThreadData<usize>; 1] = [ThreadData::new()];
+
+static mut COMM_INTERFACE_STORAGE: Option<CommInterface<dyn DataTransport>> = None;
 
 extern "C" fn comm_runner(p1: *mut c_void, _p2: *mut c_void, _p3: *mut c_void) {
-    // Cast the user data pointer back into our concrete controller type
-    let comm_if = unsafe { &mut *(p1 as *mut CommInterface<dyn DataTransport>) };
-    comm_if.run();
+    // p1 points directly to the UnsafeCell container managed by ThreadData.
+    // Zephyr-thread.rs module passes the init data pointer as the first argument to k_thread_create.
+    unsafe {
+        let init_data_ptr = p1 as *mut Option<usize>;
+        if let Some(interface_address) = *init_data_ptr {
+            let comm_if = &mut *(interface_address as *mut CommInterface<dyn DataTransport>);
+            comm_if.run();
+        } else {
+            panic!("Comm thread woke up with uninitialized interface data!");
+        }
+    }
 }
 
 pub fn spawn_comm_thread<T: DataTransport>(transport: &'static mut T, priority: i32) 
 where 
     T: DataTransport + 'static,
 {
-    let mut comm_if = CommInterface::new(transport);
+    let thread_name = CStr::from_bytes_with_nul(b"comm_runner\0").unwrap();
 
     unsafe {
-        COMM_THREAD_DATA = Some(core::mem::transmute(comm_if));
+        let comm_if: &'static mut dyn DataTransport = transport;
+        COMM_INTERFACE_STORAGE = Some(CommInterface::new(comm_if));
         
-        let comm_if_ptr = COMM_THREAD_DATA.as_mut().unwrap() as *mut _ as *mut c_void;
+        // Get a raw pointer to the Option-wrapped CommInterface in static storage
+        let storage_raw_ptr: *mut Option<CommInterface<dyn DataTransport>> = addr_of_mut!(COMM_INTERFACE_STORAGE);
+        
+        // Extract the raw pointer to the concrete inner CommInterface struct
+        let interface_raw_ptr: *mut CommInterface<dyn DataTransport> = (*storage_raw_ptr).as_mut().unwrap();
+        
+        // Convert the raw pointer straight into a plain integer address (usize)
+        let comm_if_addr = interface_raw_ptr as usize;
 
-        // 2. Invoke the initialization parameters from your local thread.rs module
-        // We pass the concrete trampoline pointer and the stack storage boundaries
-        thread::create(
-            &mut COMM_THREAD_STACK,
-            comm_runner,
-            comm_if_ptr,           // p1
-            core::ptr::null_mut(), // p2
-            core::ptr::null_mut(), // p3
+        // Invoke the initialization parameters from the Zephyr thread.rs module
+        // - Pass the raw comm_runner pointer (comm_if_addr)
+        let ready_thread: ReadyThread = ThreadData::acquire(
+            &COMM_THREAD_POOL,
+            core::slice::from_ref(&COMM_THREAD_STACK),
+            comm_if_addr     , // Pass our interface pointer down as the Send payload argument (T)
+            Some(comm_runner),
             priority,
-            0, // options
-            0, // delay
+            thread_name,
         );
+        
+        ready_thread.start();
     }
 }

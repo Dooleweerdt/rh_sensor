@@ -18,6 +18,7 @@ use log::info;
 use zephyr::raw::ZR_GPIO_OUTPUT_ACTIVE;
 use zephyr_sys::device;
 use alloc::vec::Vec;
+use core::ptr::addr_of_mut;
 
 use driver::rht_sensor::RhtSensor;
 use driver::rht_sensor::SensorChannel;
@@ -80,8 +81,10 @@ fn do_blink() {
     unsafe {
         static mut NETWORK_CHANNEL: Option<MqttTransport> = None;
         NETWORK_CHANNEL = Some(MqttTransport::new("192.168.1.21"));
-        let network_ref = NETWORK_CHANNEL.as_mut().unwrap();
-        comm::spawn_comm_thread(network_ref, 10);
+
+        let mqtt_raw_ptr: *mut Option<MqttTransport> = addr_of_mut!(NETWORK_CHANNEL);
+        let transport_ref: &'static mut MqttTransport = (*mqtt_raw_ptr).as_mut().unwrap();
+        comm::spawn_comm_thread(transport_ref, 10);
     }
 
     application::start(led0, sensors);
