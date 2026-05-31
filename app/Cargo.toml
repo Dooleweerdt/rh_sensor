@@ -16,6 +16,8 @@ crate-type = ["staticlib"]
 zephyr = "0.1.0"
 log = "0.4.22"
 zephyr-sys = { version = "0.1.0", path = "../../modules/lang/rust/zephyr-sys" }
+serde = { version = "1.0", default-features = false, features = ["derive"] }
+serde-json-core = "0.6.0"
 
 [build-dependencies]
 zephyr-build = "0.1.0"

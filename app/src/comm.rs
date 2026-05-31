@@ -17,6 +17,7 @@ pub fn get_sub_ptr() -> *const core::ffi::c_void {
 #[derive(Debug, Clone, Copy)]
 pub enum CommError {
     ConnectionFailed,
+    SerializationFailed,
     SendFailed,
 }
 
