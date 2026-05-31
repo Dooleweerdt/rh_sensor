@@ -11,6 +11,7 @@
 mod driver;
 mod application;
 mod comm;
+mod mqtt;
 extern crate alloc;
 
 use log::info;
@@ -20,7 +21,7 @@ use alloc::vec::Vec;
 
 use driver::rht_sensor::RhtSensor;
 use driver::rht_sensor::SensorChannel;
-use comm::comm_thread;
+use mqtt::MqttTransport;
 
 #[cfg(not(dt = "aliases::led0"))]
 use zephyr::time::{sleep, Duration};
@@ -75,9 +76,14 @@ fn do_blink() {
         }
     }
 
-    let _comm_thread = comm_thread();
-    _comm_thread.set_priority(10);
-    _comm_thread.start();
+    // #[cfg(feature = "use_mqtt")]
+    unsafe {
+        static mut NETWORK_CHANNEL: Option<MqttTransport> = None;
+        NETWORK_CHANNEL = Some(MqttTransport::new("192.168.1.21"));
+        let network_ref = NETWORK_CHANNEL.as_mut().unwrap();
+        comm::spawn_comm_thread(network_ref, 10);
+    }
+
     application::start(led0, sensors);
 }
 
