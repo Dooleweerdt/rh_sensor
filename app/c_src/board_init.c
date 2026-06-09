@@ -77,26 +77,26 @@ int board_init(void)
 
     #if CONFIG_WIFI
     #if WIFI_CREDENTIALS
-	int ret;
+	//int ret;
 
     // Wifi initialization - Test code
-    wifi_init();
+    // wifi_init();
 
-    do {
-        // Connect to the WiFi network (blocking)
-        ret = wifi_connect(WIFI_SSID, WIFI_PSK);
-        if (ret < 0) {
-            printk("Error (%d): WiFi connection failed. Retrying in 5s...\r\n", ret);
-            k_sleep(K_MSEC(5000)); // Wait before retrying
-        }
-    } while (ret < 0);
+    //do {
+    //    // Connect to the WiFi network (blocking)
+    //    ret = wifi_connect(WIFI_SSID, WIFI_PSK);
+    //    if (ret < 0) {
+    //        printk("Error (%d): WiFi connection failed. Retrying in 5s...\r\n", ret);
+    //        k_sleep(K_MSEC(5000)); // Wait before retrying
+    //    }
+    //} while (ret < 0);
 
-    // Wait to receive an IP address (blocking)
-    wifi_wait_for_ip_addr();
+    //// Wait to receive an IP address (blocking)
+    //wifi_wait_for_ip_addr();
 
     // Wifi initialization - Test code End
-    #else
-    #error "WIFI_SSID is not defined. Please define WIFI_SSID and WIFI"
+    //#else
+    //#error "WIFI_SSID is not defined. Please define WIFI_SSID and WIFI"
     #endif // WIFI_SSID
     #endif
 

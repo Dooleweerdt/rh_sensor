@@ -3,12 +3,22 @@ use crate::comm::CommError;
 use crate::application::SensorMsg;
 use serde::Serialize;
 use log::info;
+use core::ffi::c_void;
+
 
 #[derive(Serialize)]
 struct MqttPayload {
-    src: u32,
-    t: f32,
-    h: f32,
+    source: u32,
+    temperature: f32,
+    humidity: f32,
+}
+
+unsafe extern "C" {
+    fn wifi_init();
+    fn wifi_connect(ssid: *const c_void, psk: *const c_void) -> i32;
+    fn wifi_wait_for_ip_addr();
+    fn wifi_bridge_get_ssid() -> *const core::ffi::c_void;
+    fn wifi_bridge_get_psk() -> *const core::ffi::c_void;
 }
 
 pub struct MqttTransport {
@@ -23,11 +33,17 @@ impl MqttTransport {
 
 impl DataTransport for MqttTransport {
     fn connect(&mut self) -> Result<(), CommError> {
-        // TBD...
-        // // Invoke your Zephyr C FFI function to run the MQTT handshake
-        // crate::ffi::zephyr_mqtt_connect(self.broker_address)
-        //     .map_err(|_| "Failed to connect to Mosquitto broker")
-
+        unsafe {
+          wifi_init();
+          let ssid = wifi_bridge_get_ssid();
+          let psk = wifi_bridge_get_psk();
+          let status = wifi_connect(ssid, psk);
+            if status > 0 {
+              info!("Wifi connection error");
+              return Err(CommError::ConnectionFailed);
+          }
+          wifi_wait_for_ip_addr();
+        }
         Ok(()) // Assume success for this example
     }
 
