@@ -34,15 +34,17 @@ impl MqttTransport {
 impl DataTransport for MqttTransport {
     fn connect(&mut self) -> Result<(), CommError> {
         unsafe {
-          wifi_init();
-          let ssid = wifi_bridge_get_ssid();
-          let psk = wifi_bridge_get_psk();
-          let status = wifi_connect(ssid, psk);
+            // @TODO:Add flag for only initializing once and in case of errors where re-connect is
+            // required! 
+            wifi_init();
+            let ssid = wifi_bridge_get_ssid();
+            let psk = wifi_bridge_get_psk();
+            let status = wifi_connect(ssid, psk);
             if status > 0 {
-              info!("Wifi connection error");
-              return Err(CommError::ConnectionFailed);
-          }
-          wifi_wait_for_ip_addr();
+                info!("Wifi connection error");
+                return Err(CommError::ConnectionFailed);
+            }
+            wifi_wait_for_ip_addr();
         }
         Ok(()) // Assume success for this example
     }
