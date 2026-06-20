@@ -77,7 +77,7 @@ fn do_blink() {
         }
     }
 
-    // #[cfg(feature = "use_mqtt")]
+    #[cfg(CONFIG_WIFI)]
     unsafe {
         static mut NETWORK_CHANNEL: Option<MqttTransport> = None;
         NETWORK_CHANNEL = Some(MqttTransport::new("192.168.1.21"));

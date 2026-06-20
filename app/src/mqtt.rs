@@ -75,12 +75,3 @@ impl DataTransport for MqttTransport {
     }
 }
 
-#[cfg(not(CONFIG_WIFI))]
-impl DataTransport for MqttTransport{
-    fn connect(&mut self) -> Result<(), CommError> {
-        Ok(())
-    }
-    fn send_data(&mut self, msg: &SensorMsg) -> Result<(), CommError> {
-        Ok(())
-    }
-}
