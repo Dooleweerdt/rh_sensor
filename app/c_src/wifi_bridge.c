@@ -12,6 +12,6 @@ void * wifi_bridge_get_psk(void) {
     #ifdef WIFI_CREDENTIALS
     return WIFI_PSK;
     #else
-    return "WifiPSK"
+    return "WifiPSK";
     #endif
 }
