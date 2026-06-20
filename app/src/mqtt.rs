@@ -31,6 +31,7 @@ impl MqttTransport {
     }
 }
 
+#[cfg(CONFIG_WIFI)]
 impl DataTransport for MqttTransport {
     fn connect(&mut self) -> Result<(), CommError> {
         unsafe {

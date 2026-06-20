@@ -6,4 +6,5 @@ fn main() {
     // #[cfg(dt = "aliases::led0")]
     // ```
     zephyr_build::dt_cfgs();
+    zephyr_build::export_bool_kconfig();
 }
