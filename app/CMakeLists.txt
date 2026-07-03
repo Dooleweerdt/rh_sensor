@@ -14,3 +14,6 @@ rust_cargo_application()
 project(app LANGUAGES C)
 FILE(GLOB app_sources c_src/*.c)
 target_sources(app PRIVATE ${app_sources})
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
