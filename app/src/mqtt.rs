@@ -21,13 +21,22 @@ unsafe extern "C" {
     fn wifi_bridge_get_psk() -> *const core::ffi::c_void;
 }
 
+unsafe extern "C" {
+    fn mqtt_bridge_connect() -> i32;
+    fn mqtt_bridge_send_data(data: *const u8, len: usize) -> i32;
+}
+
 pub struct MqttTransport {
     broker_address: &'static str,
+    connected_flag: bool,
 }
 
 impl MqttTransport {
     pub fn new(broker_address: &'static str) -> Self {
-        Self { broker_address }
+        Self { 
+            broker_address, 
+            connected_flag : false 
+        }
     }
 }
 
@@ -37,15 +46,24 @@ impl DataTransport for MqttTransport {
         unsafe {
             // @TODO:Add flag for only initializing once and in case of errors where re-connect is
             // required! 
-            wifi_init();
-            let ssid = wifi_bridge_get_ssid();
-            let psk = wifi_bridge_get_psk();
-            let status = wifi_connect(ssid, psk);
-            if status > 0 {
-                info!("Wifi connection error");
-                return Err(CommError::ConnectionFailed);
+            if self.connected_flag == false {
+                wifi_init();
+                let ssid = wifi_bridge_get_ssid();
+                let psk = wifi_bridge_get_psk();
+                let status = wifi_connect(ssid, psk);
+                if status > 0 {
+                    info!("Wifi connection error");
+                    return Err(CommError::ConnectionFailed);
+                }
+                
+                wifi_wait_for_ip_addr();
+            
+                let mqtt_status = mqtt_bridge_connect();
+                if mqtt_status > 0 {
+                    info!("Connected to MQTT Broker... Addr = {}, Status = {}", self.broker_address, mqtt_status);
+                    self.connected_flag = true;
+                }
             }
-            wifi_wait_for_ip_addr();
         }
         Ok(()) // Assume success for this example
     }
@@ -65,12 +83,14 @@ impl DataTransport for MqttTransport {
         }
 
         // info!("Serialized MQTT payload: {}", core::str::from_utf8(&buf[..serialized]).unwrap());
-        info!("Pretending to send MQTT payload: source={}, temp={}C, hum={}%", wire_payload.source, wire_payload.temperature, wire_payload.humidity);
+        info!("Sending MQTT payload: source={}, temp={}C, hum={}%", wire_payload.source, wire_payload.temperature, wire_payload.humidity);
 
-        // TBD...
-        // // 3. Fire the bytes down the Zephyr POSIX/MQTT network stack via FFI
-        // crate::ffi::zephyr_mqtt_publish(buf, serialized)
-        //     .map_err(|_| "Network stack reject outbound message")
+        unsafe {
+            if mqtt_bridge_send_data(buf.as_ptr(),bytes_written) != 0 {
+                return Err(CommError::SendFailed);
+            
+            }
+        }
         Ok(())
     }
 }

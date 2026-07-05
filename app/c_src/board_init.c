@@ -10,18 +10,8 @@
 
 #include <app_version.h>
 
-// Custom libraries
-#include <app/drivers/wifi.h>
-#include <app/wifi_settings.h>
-
 LOG_MODULE_REGISTER(board_init, CONFIG_APP_LOG_LEVEL);
 
-#ifndef WIFI_CREDENTIALS
-// Pseudo credentials for testing - real credentials is in wifi_settings.h
-#define WIFI_CREDENTIALS 1
-#define WIFI_SSID "WirelessNetwork"
-#define WIFI_PSK "Password"
-#endif
 
 #if CONFIG_DISPLAY
 #define DISPLAY_DRIVER      DT_CHOSEN(zephyr_display)
@@ -74,31 +64,6 @@ int board_init(void)
     cfb_framebuffer_finalize(display_dev);
     #endif // CONFIG_LVGL
     #endif // CONFIG_DISPLAY
-
-    #if CONFIG_WIFI
-    #if WIFI_CREDENTIALS
-	//int ret;
-
-    // Wifi initialization - Test code
-    // wifi_init();
-
-    //do {
-    //    // Connect to the WiFi network (blocking)
-    //    ret = wifi_connect(WIFI_SSID, WIFI_PSK);
-    //    if (ret < 0) {
-    //        printk("Error (%d): WiFi connection failed. Retrying in 5s...\r\n", ret);
-    //        k_sleep(K_MSEC(5000)); // Wait before retrying
-    //    }
-    //} while (ret < 0);
-
-    //// Wait to receive an IP address (blocking)
-    //wifi_wait_for_ip_addr();
-
-    // Wifi initialization - Test code End
-    //#else
-    //#error "WIFI_SSID is not defined. Please define WIFI_SSID and WIFI"
-    #endif // WIFI_SSID
-    #endif
 
     return 0;
 }
