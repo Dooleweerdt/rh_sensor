@@ -30,7 +30,7 @@ pub fn broadcast_data(msg: *const SensorMsg) {
 }
 
 pub fn start (mut led0: GpioPin, mut sensors: Vec<RhtSensor>) {
-    let duration = Duration::millis_at_least(1000);
+    let duration = Duration::millis_at_least(30000);
 
     loop {
         led0.toggle_pin();

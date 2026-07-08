@@ -1,6 +1,7 @@
 #include <string.h>
 #include <zephyr/kernel.h>
 #include <zephyr/net/wifi_mgmt.h>
+#include <zephyr/net/net_config.h>
 
 // Wifi code from Shawn Hymel (DigiKey): https://www.digikey.dk/da/maker/tutorials/2025/introduction-to-zephyr-part-11-wifi-and-iot 
 
@@ -50,6 +51,18 @@ static void on_ipv4_obtained(struct net_mgmt_event_callback *cb,
 // Initialize the WiFi event callbacks
 void wifi_init(void)
 {
+    printk("Configuring Wi-Fi Subsystems...\n");
+
+    // 1. Get a handle to Zephyr's default network interface (the ESP32 Wi-Fi station)
+    struct net_if *iface = net_if_get_default();
+    if (!iface) {
+        printk("Error: No network interface found!\n");
+        return;
+    }
+
+    // 2. Administratively bring the interface UP (turns on the network stack for this card)
+    net_if_up(iface);
+
     // Initialize the event callbacks
     net_mgmt_init_event_callback(&wifi_cb,
                                  on_wifi_connection_event,
@@ -83,6 +96,8 @@ int wifi_connect(char *ssid, char *psk)
     params.channel = WIFI_CHANNEL_ANY;
     params.mfp = WIFI_MFP_OPTIONAL;
 
+    //printk("Wifi attemting connection...");
+
     // Connect to the WiFi network
     ret = net_mgmt(NET_REQUEST_WIFI_CONNECT,
                    iface,
@@ -91,6 +106,8 @@ int wifi_connect(char *ssid, char *psk)
 
     // Wait for the connection to complete
     k_sem_take(&sem_wifi, K_FOREVER);
+
+    //printk("Wifi Connected!\r\n");
 
     return ret;
 }
