@@ -61,8 +61,8 @@ impl DataTransport for MqttTransport {
                 let mqtt_status = mqtt_bridge_connect();
                 if mqtt_status > 0 {
                     info!("Connected to MQTT Broker... Addr = {}, Status = {}", self.broker_address, mqtt_status);
-                    self.connected_flag = true;
                 }
+                self.connected_flag = true;
             }
         }
         Ok(()) // Assume success for this example

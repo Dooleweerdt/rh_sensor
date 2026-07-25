@@ -74,6 +74,9 @@ void wifi_init(void)
     // Add the event callbacks
     net_mgmt_add_event_callback(&wifi_cb);
     net_mgmt_add_event_callback(&ipv4_cb);
+
+    /* Wait for WiFi to initialize */
+    k_sleep(K_SECONDS(2));
 }
 
 // Connect to the WiFi network (blocking)
@@ -162,6 +165,9 @@ void wifi_wait_for_ip_addr(void)
         printk("  IP address: %s\r\n", ip_addr);
         printk("  Gateway: %s\r\n", gw_addr);
     }
+
+    /* Small delay to ensure network stack is ready */
+    k_sleep(K_MSEC(500));
 }
 
 // Disconnect from the WiFi network
