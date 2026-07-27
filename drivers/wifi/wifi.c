@@ -99,8 +99,6 @@ int wifi_connect(char *ssid, char *psk)
     params.channel = WIFI_CHANNEL_ANY;
     params.mfp = WIFI_MFP_OPTIONAL;
 
-    //printk("Wifi attemting connection...");
-
     // Connect to the WiFi network
     ret = net_mgmt(NET_REQUEST_WIFI_CONNECT,
                    iface,
@@ -109,8 +107,6 @@ int wifi_connect(char *ssid, char *psk)
 
     // Wait for the connection to complete
     k_sem_take(&sem_wifi, K_FOREVER);
-
-    //printk("Wifi Connected!\r\n");
 
     return ret;
 }

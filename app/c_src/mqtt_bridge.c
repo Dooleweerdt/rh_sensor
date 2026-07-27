@@ -5,12 +5,14 @@
 #include <zephyr/net/socket.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/posix/poll.h>
+#include <zephyr/random/random.h>
 
 #include <app/wifi_settings.h>
 
 LOG_MODULE_REGISTER(mqtt_bridge, LOG_LEVEL_INF);
 
 #define COMM_TIMEOUT 2000
+#define PUBLISH_TIMEOUT 500
 
 static struct mqtt_client client_ctx;
 static struct sockaddr_storage broker_addr;
@@ -99,7 +101,7 @@ int32_t mqtt_bridge_connect(void) {
             k_sleep(K_SECONDS(1));
         }
 
-        printk("mqtt_bridge_connect: mqtt_connect status=%d, cnt=%d\r\n",err, i);
+        LOG_INF("mqtt_bridge_connect: mqtt_connect status=%d, cnt=%d",err, i);
     }
 
     return err;
@@ -113,19 +115,41 @@ int32_t mqtt_bridge_send_data(const uint8_t * payload, size_t len) {
     param.message.topic.topic.size = strlen("RH4sense");
     param.message.payload.data = (uint8_t*)payload;
     param.message.payload.len = len;
-
+    param.message_id = sys_rand16_get();
+    
     param.dup_flag = 0;
     param.retain_flag = 0;
 
     int32_t ret = mqtt_publish(&client_ctx, &param);
 
-    // TODO: NOTE: Error = 128 -> Not connected (verify_tx_state fails and reports ENOTCONN (-128))
-    // - Looks like the state is 02 (TCP CONNECTED) where it should be 4 (CONNECTED)...
-    printk("mqtt_bridge_send_data: Publish status=%d\r\n", ret);
-
-    if (ret == 0) {
-        ret = mqtt_live(&client_ctx);
-        printk("mqtt_bridge_send_data: Live status=%d\r\n", ret);
+    if (ret != 0) {
+        LOG_ERR("mqtt_bridge_send_data: publish error = %d", ret);
+        return ret;
     }
+
+    if (nfds > 0) {
+        ret = poll(fds, nfds, PUBLISH_TIMEOUT);
+        if (ret < 0) {
+            LOG_ERR("mqtt_bridge_send_data: poll error: %d", errno);
+            return ret;
+        }
+    }
+
+    ret = mqtt_input(&client_ctx);
+
+    if (ret != 0) {
+        LOG_ERR("mqtt_bridge_send_data: input error %d", ret); 
+        return ret;
+    }
+
+    ret = mqtt_live(&client_ctx);
+
+    if ((ret != 0) && (ret != -EAGAIN)) {
+        LOG_ERR("mqtt_bridge_send_data: live error %d", ret);
+        return ret;
+    }
+
+    ret = mqtt_input(&client_ctx);
+
     return ret;
 }
