@@ -1,9 +1,12 @@
+#include "zephyr/net/net_mgmt.h"
 #include <string.h>
 #include <zephyr/kernel.h>
 #include <zephyr/net/wifi_mgmt.h>
 #include <zephyr/net/net_config.h>
 
 // Wifi code from Shawn Hymel (DigiKey): https://www.digikey.dk/da/maker/tutorials/2025/introduction-to-zephyr-part-11-wifi-and-iot 
+
+LOG_MODULE_REGISTER(wifi_app, LOG_LEVEL_INF);
 
 // Event callbacks
 static struct net_mgmt_event_callback wifi_cb;
@@ -22,17 +25,16 @@ static void on_wifi_connection_event(struct net_mgmt_event_callback *cb,
 
     if (mgmt_event == NET_EVENT_WIFI_CONNECT_RESULT) {
         if (status->status) {
-            printk("Error (%d): Connection request failed\r\n", status->status);
+            LOG_INF("Error (%d): Connection request failed\r\n", status->status);
         } else {
-            printk("Connected!\r\n");
+            LOG_INF("Connected!\r\n");
             k_sem_give(&sem_wifi);
         }
     } else if (mgmt_event == NET_EVENT_WIFI_DISCONNECT_RESULT) {
         if (status->status) {
-            printk("Error (%d): Disconnection request failed\r\n", status->status);
+            LOG_INF("Error (%d): Disconnection request failed\r\n", status->status);
         } else {
-            printk("Disconnected\r\n");
-            k_sem_take(&sem_wifi, K_NO_WAIT);
+            LOG_INF("Disconnected\r\n");
         }
     }
 }
@@ -44,6 +46,7 @@ static void on_ipv4_obtained(struct net_mgmt_event_callback *cb,
 {
     // Signal that the IP address has been obtained
     if (mgmt_event == NET_EVENT_IPV4_ADDR_ADD) {
+        LOG_INF("IPv4 Address obtained\r\n");
         k_sem_give(&sem_ipv4);
     }
 }
@@ -51,12 +54,19 @@ static void on_ipv4_obtained(struct net_mgmt_event_callback *cb,
 // Initialize the WiFi event callbacks
 void wifi_init(void)
 {
-    printk("Configuring Wi-Fi Subsystems...\n");
+    static bool is_initialized = false;
+    
+    if (is_initialized) {
+        LOG_WRN("Wi-Fi Subsystems already initialized. Skipping.");
+        return;
+    }
 
+    LOG_INF("Configuring Wi-Fi Subsystems...");
+    
     // 1. Get a handle to Zephyr's default network interface (the ESP32 Wi-Fi station)
     struct net_if *iface = net_if_get_default();
     if (!iface) {
-        printk("Error: No network interface found!\n");
+        LOG_ERR("Error: No network interface found!");
         return;
     }
 
@@ -70,13 +80,15 @@ void wifi_init(void)
     net_mgmt_init_event_callback(&ipv4_cb,
                                  on_ipv4_obtained,
                                  NET_EVENT_IPV4_ADDR_ADD);
-    
+
     // Add the event callbacks
     net_mgmt_add_event_callback(&wifi_cb);
     net_mgmt_add_event_callback(&ipv4_cb);
 
+    is_initialized = true;
+
     /* Wait for WiFi to initialize */
-    k_sleep(K_SECONDS(2));
+    k_sleep(K_MSEC(500));
 }
 
 // Connect to the WiFi network (blocking)
@@ -84,7 +96,7 @@ int wifi_connect(char *ssid, char *psk)
 {
     int ret;
     struct net_if *iface;
-    struct wifi_connect_req_params params;
+    static struct wifi_connect_req_params params;
 
     // Get the default networking interface
     iface = net_if_get_default();
@@ -105,9 +117,16 @@ int wifi_connect(char *ssid, char *psk)
                    &params,
                    sizeof(params));
 
-    // Wait for the connection to complete
-    k_sem_take(&sem_wifi, K_FOREVER);
+    LOG_INF("WIFI Driver: Waiting for Semaphor!");
 
+    // Wait for the connection to complete
+    ret = k_sem_take(&sem_wifi, K_MSEC(10000));
+    if (ret == -EAGAIN) {
+        LOG_ERR("WIFI Driver: Connection TIMEOUT! The driver/hardware hung up.");
+        return -ETIMEDOUT;
+    } else {
+        LOG_INF("WIFI Driver: Semaphor acquired!");
+    }
     return ret;
 }
 
@@ -123,14 +142,19 @@ void wifi_wait_for_ip_addr(void)
     iface = net_if_get_default();
 
     // Wait for the IPv4 address to be obtained
-    k_sem_take(&sem_ipv4, K_FOREVER);
+    int ret = k_sem_take(&sem_ipv4, K_MSEC(10000));
+
+    if (ret == -EAGAIN) {
+        LOG_ERR("WIFI Driver: Wait for IP TIMEOUT! The driver/hardware hung up.");
+        return;
+    }
 
     // Get the WiFi status
     if (net_mgmt(NET_REQUEST_WIFI_IFACE_STATUS,
                  iface,
                  &status,
                  sizeof(struct wifi_iface_status))) {
-        printk("Error: WiFi status request failed\r\n");
+        LOG_ERR("Error: WiFi status request failed!");
     }
 
     // Get the IP address
@@ -139,7 +163,7 @@ void wifi_wait_for_ip_addr(void)
                       &iface->config.ip.ipv4->unicast[0].ipv4.address.in_addr,
                       ip_addr,
                       sizeof(ip_addr)) == NULL) {
-        printk("Error: Could not convert IP address to string\r\n");
+        LOG_ERR("Error: Could not convert IP address to string!");
     }
 
     // Get the gateway address
@@ -148,18 +172,18 @@ void wifi_wait_for_ip_addr(void)
                       &iface->config.ip.ipv4->gw,
                       gw_addr,
                       sizeof(gw_addr)) == NULL) {
-        printk("Error: Could not convert gateway address to string\r\n");
+        LOG_ERR("Error: Could not convert gateway address to string!");
     }
 
     // Print the WiFi status
-    printk("WiFi status:\r\n");
+    LOG_INF("WiFi status:");
     if (status.state >= WIFI_STATE_ASSOCIATED) {
-        printk("  SSID: %-32s\r\n", status.ssid);
-        printk("  Band: %s\r\n", wifi_band_txt(status.band));
-        printk("  Channel: %d\r\n", status.channel);
-        printk("  Security: %s\r\n", wifi_security_txt(status.security));
-        printk("  IP address: %s\r\n", ip_addr);
-        printk("  Gateway: %s\r\n", gw_addr);
+       LOG_INF("  SSID: %-32s", status.ssid);
+       LOG_INF("  Band: %s", wifi_band_txt(status.band));
+       LOG_INF("  Channel: %d", status.channel);
+       LOG_INF("  Security: %s", wifi_security_txt(status.security));
+       LOG_INF("  IP address: %s", ip_addr);
+       LOG_INF("  Gateway: %s", gw_addr);
     }
 
     /* Small delay to ensure network stack is ready */

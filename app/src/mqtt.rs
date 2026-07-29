@@ -51,7 +51,7 @@ impl DataTransport for MqttTransport {
                 let ssid = wifi_bridge_get_ssid();
                 let psk = wifi_bridge_get_psk();
                 let status = wifi_connect(ssid, psk);
-                if status > 0 {
+                if status < 0 {
                     info!("Wifi connection error");
                     return Err(CommError::ConnectionFailed);
                 }
