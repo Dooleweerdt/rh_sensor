@@ -7,21 +7,13 @@
 #include <zephyr/drivers/sensor.h>
 #include <zephyr/logging/log.h>
 
-#include <app/drivers/blink.h>
-
 LOG_MODULE_REGISTER(main, CONFIG_APP_LOG_LEVEL);
-
-#define BLINK_PERIOD_MS_STEP 100U
-#define BLINK_PERIOD_MS_MAX  1000U
 
 
 int main(void)
 {
 	int ret;
 	const struct device *sensor;
-    #if CONFIG_BLINK
-    const struct device *blink;
-    #endif
 	struct sensor_value val;
 
 	sensor = DEVICE_DT_GET(DT_NODELABEL(example_sensor));
@@ -30,21 +22,7 @@ int main(void)
 		return 0;
 	}
 
-    #if CONFIG_BLINK
-	blink = DEVICE_DT_GET(DT_NODELABEL(blink_led));
-	if (!device_is_ready(blink)) {
-		LOG_ERR("Blink LED not ready");
-		return 0;
-	}
-
-	ret = blink_off(blink);
-	if (ret < 0) {
-		LOG_ERR("Could not turn off LED (%d)", ret);
-		return 0;
-	}
-    #endif
-
-	printk("Use the sensor to change LED blinking period\n");
+	LOG_INF("Main is now entering SampleSensor loop!");
 
 	while (1) {
 		ret = sensor_sample_fetch(sensor);

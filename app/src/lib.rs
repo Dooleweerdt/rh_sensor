@@ -22,6 +22,7 @@ use core::ptr::addr_of_mut;
 
 use driver::rht_sensor::RhtSensor;
 use driver::rht_sensor::SensorChannel;
+use driver::gpio_blink::GpioBlink;
 use mqtt::MqttTransport;
 
 #[cfg(not(dt = "aliases::led0"))]
@@ -58,6 +59,7 @@ fn do_blink() {
     }
 
     led0.configure(ZR_GPIO_OUTPUT_ACTIVE);
+    let gpio_blink = GpioBlink::new(led0);
 
     // Create a "List" of different sensors (Trait Objects)
     let mut sensors = Vec::new();
@@ -87,7 +89,7 @@ fn do_blink() {
         comm::spawn_comm_thread(transport_ref, 10);
     }
 
-    application::start(led0, sensors);
+    application::start(sensors);
 }
 
 #[cfg(not(dt = "aliases::led0"))]

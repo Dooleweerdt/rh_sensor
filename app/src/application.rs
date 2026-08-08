@@ -1,6 +1,7 @@
+pub mod blink;
+
 use log::info;
 use zephyr::time::{sleep, Duration};
-use zephyr::device::gpio::GpioPin;
 use alloc::vec::Vec;
 
 use crate::driver::rht_sensor::RhtSensor;
@@ -29,12 +30,10 @@ pub fn broadcast_data(msg: *const SensorMsg) {
     }
 }
 
-pub fn start (mut led0: GpioPin, mut sensors: Vec<RhtSensor>) {
+pub fn start (mut sensors: Vec<RhtSensor>) {
     let duration = Duration::millis_at_least(30000);
 
     loop {
-        led0.toggle_pin();
-
         for s in &mut sensors {
             let id = match s.name {"SHT3x" => ID_SHT3X, "DS18B20" => ID_ONEWIRE, _ => ID_MOCK};
             let mut sensor_data = SensorMsg { source: id, temp: 0.0, hum: 0.0 };
