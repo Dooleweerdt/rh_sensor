@@ -4,6 +4,8 @@ use zephyr::device::gpio::GpioPin;
 use zephyr::sync::Arc;
 use zephyr::sync::Mutex;
 
+use log::info;
+
 use crate::application::blink::Blink; 
 
 pub struct GpioBlink {
@@ -11,18 +13,21 @@ pub struct GpioBlink {
 }
 
 pub struct BlinkInner {
-    led: GpioPin,
+    led: Mutex<GpioPin>,
     timer: Mutex<Option<StoppedTimer>>,
 }
 
 impl GpioBlink {
     fn on_timer_expired(inner: &Arc<BlinkInner>) {
-        //inner.led.toggle();
+        let mut led = inner.led.lock().unwrap();
+        led.toggle_pin();
+        info!("LED Pin Toggles...");
     }
 
     pub fn new(led: GpioPin) -> Self {
+        let pin = Mutex::new(led);
         let tm = Mutex::new(Some(StoppedTimer::new()));
-        Self{inner: Arc::new(BlinkInner{ led, timer:tm }) }
+        Self{inner: Arc::new(BlinkInner{ led:pin, timer:tm }) }
     }
 }
 
@@ -36,11 +41,12 @@ impl Blink for GpioBlink {
         let d = Duration::from_ticks(period_ms.into());
 
         // Lock the mutex and take ownership of the timer out of the Option
-        if let Ok(mut guard) = self.inner.timer.lock() {
-            if let Some(timer) = guard.take() {
-                let _started_timer = timer.start_callback(cb, delay, d);
-            }
+        let mut guard = self.inner.timer.lock().unwrap();
+
+        if let Some(timer) = guard.take() {
+            let _started_timer = timer.start_callback(cb, delay, d);
         }
+
         return Ok(());
     }
 
