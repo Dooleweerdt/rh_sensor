@@ -1,8 +1,13 @@
-use zephyr::timer::{Callback, StoppedTimer};
+use zephyr::timer::{Callback, StoppedTimer, CallbackTimer};
 use zephyr::time::{Duration, NoWait};
 use zephyr::device::gpio::GpioPin;
 use zephyr::sync::Arc;
-use zephyr::sync::Mutex;
+use zephyr::sync::SpinMutex;
+
+use core::pin::Pin;
+
+#[cfg(CONFIG_RUST_ALLOC)]
+use alloc::boxed::Box;
 
 use log::info;
 
@@ -13,8 +18,8 @@ pub struct GpioBlink {
 }
 
 pub struct BlinkInner {
-    led: Mutex<GpioPin>,
-    timer: Mutex<Option<StoppedTimer>>,
+    led: SpinMutex<GpioPin>,
+    timer: SpinMutex<Option<Pin<Box<CallbackTimer<Arc<BlinkInner>>>>>>,
 }
 
 impl GpioBlink {
@@ -25,8 +30,8 @@ impl GpioBlink {
     }
 
     pub fn new(led: GpioPin) -> Self {
-        let pin = Mutex::new(led);
-        let tm = Mutex::new(Some(StoppedTimer::new()));
+        let pin = SpinMutex::new(led);
+        let tm = SpinMutex::new(None);
         Self{inner: Arc::new(BlinkInner{ led:pin, timer:tm }) }
     }
 }
@@ -43,9 +48,12 @@ impl Blink for GpioBlink {
         // Lock the mutex and take ownership of the timer out of the Option
         let mut guard = self.inner.timer.lock().unwrap();
 
-        if let Some(timer) = guard.take() {
-            let _started_timer = timer.start_callback(cb, delay, d);
-        }
+        //if let Some(timer) = guard.take() {
+        let tm_stopped = StoppedTimer::new();
+        // Make sure to store the return value, so it doesn't go out of scope...
+        *guard = Some(tm_stopped.start_callback(cb, delay, d)); 
+        info!("LED Pin timer started!");
+        //}
 
         return Ok(());
     }
