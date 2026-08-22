@@ -63,7 +63,7 @@ impl DataTransport for MqttTransport {
                 wifi_wait_for_ip_addr();
             
                 let mqtt_status = mqtt_bridge_connect();
-                if mqtt_status > 0 {
+                if mqtt_status == 0 {
                     info!("Connected to MQTT Broker... Addr = {}, Status = {}", self.broker_address, mqtt_status);
                     let _ = self.led.set_period_ms(1000);
                 }
