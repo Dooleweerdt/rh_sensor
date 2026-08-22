@@ -61,7 +61,7 @@ fn do_blink() {
 
     led0.configure(ZR_GPIO_OUTPUT_ACTIVE);
     let mut gpio_blink = GpioBlink::new(led0);
-    let _ = gpio_blink.set_period_ms(1000);
+    let _ = gpio_blink.set_period_ms(100);
 
     // Create a "List" of different sensors (Trait Objects)
     let mut sensors = Vec::new();
@@ -84,7 +84,7 @@ fn do_blink() {
     #[cfg(CONFIG_WIFI)]
     unsafe {
         static mut NETWORK_CHANNEL: Option<MqttTransport> = None;
-        NETWORK_CHANNEL = Some(MqttTransport::new("192.168.1.21"));
+        NETWORK_CHANNEL = Some(MqttTransport::new("192.168.1.21", gpio_blink));
 
         let mqtt_raw_ptr: *mut Option<MqttTransport> = addr_of_mut!(NETWORK_CHANNEL);
         let transport_ref: &'static mut MqttTransport = (*mqtt_raw_ptr).as_mut().unwrap();

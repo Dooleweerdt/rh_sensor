@@ -1,3 +1,5 @@
+use crate::application::blink::Blink;
+use crate::driver::gpio_blink::GpioBlink;
 use crate::comm::DataTransport;
 use crate::comm::CommError;
 use crate::application::SensorMsg;
@@ -29,13 +31,15 @@ unsafe extern "C" {
 pub struct MqttTransport {
     broker_address: &'static str,
     connected_flag: bool,
+    led: GpioBlink,
 }
 
 impl MqttTransport {
-    pub fn new(broker_address: &'static str) -> Self {
+    pub fn new(broker_address: &'static str, led: GpioBlink) -> Self {
         Self { 
             broker_address, 
-            connected_flag : false 
+            connected_flag : false, 
+            led: led,
         }
     }
 }
@@ -61,6 +65,7 @@ impl DataTransport for MqttTransport {
                 let mqtt_status = mqtt_bridge_connect();
                 if mqtt_status > 0 {
                     info!("Connected to MQTT Broker... Addr = {}, Status = {}", self.broker_address, mqtt_status);
+                    let _ = self.led.set_period_ms(1000);
                 }
                 self.connected_flag = true;
             }

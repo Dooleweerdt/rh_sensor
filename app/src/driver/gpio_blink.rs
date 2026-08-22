@@ -9,8 +9,6 @@ use core::pin::Pin;
 #[cfg(CONFIG_RUST_ALLOC)]
 use alloc::boxed::Box;
 
-use log::info;
-
 use crate::application::blink::Blink; 
 
 pub struct GpioBlink {
@@ -26,7 +24,6 @@ impl GpioBlink {
     fn on_timer_expired(inner: &Arc<BlinkInner>) {
         let mut led = inner.led.lock().unwrap();
         led.toggle_pin();
-        info!("LED Pin Toggles...");
     }
 
     pub fn new(led: GpioPin) -> Self {
@@ -38,22 +35,29 @@ impl GpioBlink {
 
 impl Blink for GpioBlink {
     fn set_period_ms(&mut self, period_ms: u32) -> Result<(), i32> {
+        // Lock the mutex and take ownership of the timer out of the Option
+        let mut guard = self.inner.timer.lock().unwrap();
+        
+        let tm_stopped: StoppedTimer = if let Some(running_timer) = guard.take() {
+            // SAFETY: We are immediately passing the unpinned `CallbackTimer` to `.stop()`, 
+            // which deregisters it from Zephyr's C kernel before it can ever move in RAM.
+            let boxed_timer = unsafe { Pin::into_inner_unchecked(running_timer) };
+            (*boxed_timer).stop()
+        } else {
+            // No timer was running - return a new one
+            StoppedTimer::new()
+        };
+
         let cb = Callback {
             call: Self::on_timer_expired, 
             data: Arc::clone(&self.inner),
         };
+            
         let delay = NoWait;
         let d = Duration::from_ticks(period_ms.into());
 
-        // Lock the mutex and take ownership of the timer out of the Option
-        let mut guard = self.inner.timer.lock().unwrap();
-
-        //if let Some(timer) = guard.take() {
-        let tm_stopped = StoppedTimer::new();
         // Make sure to store the return value, so it doesn't go out of scope...
         *guard = Some(tm_stopped.start_callback(cb, delay, d)); 
-        info!("LED Pin timer started!");
-        //}
 
         return Ok(());
     }
