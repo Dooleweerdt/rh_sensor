@@ -14,15 +14,8 @@ LOG_MODULE_REGISTER(mqtt_bridge, LOG_LEVEL_INF);
 #define COMM_TIMEOUT 2000
 #define PUBLISH_TIMEOUT 500
 
-#ifndef WIFI_CREDENTIALS
-#define MQTT_USER "Dummy"
-#define MQTT_PASSWORD "Pass"
-#endif
-
 static struct mqtt_client client_ctx;
-#if CONFIG_WIFI
 static struct sockaddr_storage broker_addr;
-#endif
 static uint8_t rx_buffer[256];
 static uint8_t tx_buffer[256];
 
@@ -52,19 +45,15 @@ static void mqtt_evt_handler(struct mqtt_client *const client, const struct mqtt
 int32_t mqtt_bridge_connect(void) {
     mqtt_client_init(&client_ctx);
 
-    #if CONFIG_WIFI
     // Configure broker address details (e.g., 192.168.1.21:1883)
     struct sockaddr_in *broker4 = (struct sockaddr_in *)&broker_addr;
     broker4->sin_family = AF_INET;
     broker4->sin_port = htons(1883);
     zsock_inet_pton(AF_INET, "192.168.1.21", &broker4->sin_addr);
-    #endif
 
     client_ctx.client_id.utf8 = (const uint8_t *)"Zephyr_RH_Sensor";
     client_ctx.client_id.size = strlen("Zephyr_RH_Sensor");
-    #if CONFIG_WIFI
     client_ctx.broker = &broker_addr;
-    #endif
     client_ctx.evt_cb = mqtt_evt_handler;
 
     client_ctx.user_name = malloc(sizeof(struct mqtt_utf8));   
