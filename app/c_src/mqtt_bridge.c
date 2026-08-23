@@ -14,6 +14,11 @@ LOG_MODULE_REGISTER(mqtt_bridge, LOG_LEVEL_INF);
 #define COMM_TIMEOUT 2000
 #define PUBLISH_TIMEOUT 500
 
+#ifndef WIFI_CREDENTIALS
+#define MQTT_USER "Dummy"
+#define MQTT_PASSWORD "Pass"
+#endif
+
 static struct mqtt_client client_ctx;
 #if CONFIG_WIFI
 static struct sockaddr_storage broker_addr;
