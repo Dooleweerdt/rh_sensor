@@ -100,8 +100,6 @@ int32_t mqtt_bridge_connect(void) {
             mqtt_abort(&client_ctx);
             k_sleep(K_SECONDS(1));
         }
-
-        LOG_INF("mqtt_bridge_connect: mqtt_connect status=%d, cnt=%d",err, i);
     }
 
     return err;
@@ -124,6 +122,7 @@ int32_t mqtt_bridge_send_data(const uint8_t * payload, size_t len) {
 
     if (ret != 0) {
         LOG_ERR("mqtt_bridge_send_data: publish error = %d", ret);
+        is_connected = false;
         return ret;
     }
 
@@ -131,6 +130,7 @@ int32_t mqtt_bridge_send_data(const uint8_t * payload, size_t len) {
         ret = poll(fds, nfds, PUBLISH_TIMEOUT);
         if (ret < 0) {
             LOG_ERR("mqtt_bridge_send_data: poll error: %d", errno);
+            is_connected = false;
             return ret;
         }
     }
@@ -139,6 +139,7 @@ int32_t mqtt_bridge_send_data(const uint8_t * payload, size_t len) {
 
     if (ret != 0) {
         LOG_ERR("mqtt_bridge_send_data: input error %d", ret); 
+        is_connected = false;
         return ret;
     }
 
@@ -146,6 +147,7 @@ int32_t mqtt_bridge_send_data(const uint8_t * payload, size_t len) {
 
     if ((ret != 0) && (ret != -EAGAIN)) {
         LOG_ERR("mqtt_bridge_send_data: live error %d", ret);
+        is_connected = false;
         return ret;
     }
 

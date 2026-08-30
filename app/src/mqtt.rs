@@ -48,8 +48,6 @@ impl MqttTransport {
 impl DataTransport for MqttTransport {
     fn connect(&mut self) -> Result<(), CommError> {
         unsafe {
-            // @TODO:Add flag for only initializing once and in case of errors where re-connect is
-            // required! 
             if self.connected_flag == false {
                 wifi_init();
                 let ssid = wifi_bridge_get_ssid();
@@ -70,7 +68,7 @@ impl DataTransport for MqttTransport {
                 self.connected_flag = true;
             }
         }
-        Ok(()) // Assume success for this example
+        Ok(())
     }
 
     fn send_data(&mut self, msg: &SensorMsg) -> Result<(), CommError> {
@@ -87,13 +85,14 @@ impl DataTransport for MqttTransport {
             info!("Successfully generated JSON payload: {}", json_str);
         }
 
-        // info!("Serialized MQTT payload: {}", core::str::from_utf8(&buf[..serialized]).unwrap());
         info!("Sending MQTT payload: source={}, temp={}C, hum={}%", wire_payload.source, wire_payload.temperature, wire_payload.humidity);
 
         unsafe {
             if mqtt_bridge_send_data(buf.as_ptr(),bytes_written) != 0 {
+                info!("MQTT Send error!");
+                self.connected_flag = 0;
                 return Err(CommError::SendFailed);
-            
+
             }
         }
         Ok(())
