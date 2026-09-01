@@ -90,7 +90,7 @@ impl DataTransport for MqttTransport {
         unsafe {
             if mqtt_bridge_send_data(buf.as_ptr(),bytes_written) != 0 {
                 info!("MQTT Send error!");
-                self.connected_flag = 0;
+                self.connected_flag = false;
                 return Err(CommError::SendFailed);
 
             }
