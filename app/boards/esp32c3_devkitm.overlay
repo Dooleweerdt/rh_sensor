@@ -11,22 +11,14 @@
 
 / {
 	aliases {
-		/*sw0 = &user_button1;*/
 		led0 = &blue_led;
 	};
 
-	/* This uses the same gpio as th user button declared in board file! */
 	example_sensor: example-sensor {
 		compatible = "zephyr,example-sensor";
-		input-gpios = <&gpio0 9 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+		input-gpios = <&gpio0 7 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
 	};
 
-	/*blink_led: blink-led {
-		compatible = "blink-gpio-led";
-		led-gpios = <&gpio0 10 GPIO_ACTIVE_HIGH>;
-		blink-period-ms = <1000>;
-	};*/
-	
 	leds {
 		compatible = "gpio-leds";
 
@@ -40,7 +32,7 @@
     w1: w1 {
         compatible = "zephyr,w1-gpio";
         /* Pick an available GPIO, e.g., GPIO 4 */
-        gpios = <&gpio0 4 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
+        gpios = <&gpio0 4 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
         status = "okay";
 
         ds18b20: ds18b20 {
@@ -58,11 +50,12 @@
  	};
 };
 
-&i2c0 { /* SDA P8, SCL P9, Alert P2 */
+&i2c0 { /* SDA P8, SCL P9, Alert P1 */
+	status = "okay";
 	sht3xd:sht3xd@45 {
 		compatible = "sensirion,sht3xd";
 		reg = <0x45>; /* ADDR pin pulled high, else 0x44 */
-		alert-gpios = <&gpio0 2 GPIO_ACTIVE_HIGH>;
+		alert-gpios = <&gpio0 1 GPIO_ACTIVE_HIGH>;
 	};
 };
 
