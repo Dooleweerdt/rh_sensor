@@ -67,7 +67,7 @@ dap.configurations.c = {
     request = "launch",
     -- Path to your project's compiled ELF symbol binary file
     program = function()
-      return vim.fn.getcwd() .. '/build/app/zephyr/zephyr.elf'
+      return vim.fn.getcwd() .. '/../build/app/zephyr/zephyr.elf'
     end,
     -- Connects straight to an active background openocd/jlink instance running on port 2331
     cwd = '${workspaceFolder}',
