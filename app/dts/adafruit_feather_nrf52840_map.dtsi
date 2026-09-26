@@ -1,0 +1,50 @@
+
+/* Expand internal MCUboot and Slot0 partitions */
+&flash0 {
+    partitions {
+        ranges;
+        #address-cells = <1>;
+        #size-cells = <1>;
+
+		/* Delete the default board partitions that start at 0xc000 and 0x82000 */
+        /delete-node/ partition@c000;
+        /delete-node/ partition@82000;
+
+        /* 1. MCUboot partition increased to 64KB (0x10000) */
+        boot_partition: partition@0 {
+            compatible = "zephyr,mapped-partition";
+            label = "mcuboot";
+            reg = <0x00000000 0x00010000>;
+        };
+
+        /* 2. Slot 0 starts at 0x10000 and uses remaining internal flash */
+        slot0_partition: partition@10000 {
+            compatible = "zephyr,mapped-partition";
+            label = "image-0";
+            reg = <0x00010000 0x000F8000>;
+        };
+
+        /* 3. Storage partition from 0xF8000 -> 0xFFFFF
+    };
+};
+
+&gd25q16 {
+    partitions {
+        ranges;
+        #address-cells = <1>;
+        #size-cells = <1>;
+
+        /* This becomes your MCUboot secondary slot */
+        slot1_partition: partition@0 {
+            compatible = "zephyr,mapped-partition";
+            label = "image-1";
+            reg = <0x00000000 0x000F8000>;
+        };
+
+        storage_partition: partition@f8000 {
+            compatible = "zephyr,mapped-partition";
+            label = "storage";
+            reg = <0x000F8000 0x00100000>;
+        };
+    };
+};
