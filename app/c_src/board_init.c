@@ -7,6 +7,7 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/drivers/display.h>
 #include <zephyr/display/cfb.h>
+#include <app/smp_ble.h>
 
 #include <app_version.h>
 
@@ -65,6 +66,8 @@ int board_init(void)
     #endif // CONFIG_LVGL
     #endif // CONFIG_DISPLAY
 
+	init_smp_ble();
+    
     return 0;
 }
 

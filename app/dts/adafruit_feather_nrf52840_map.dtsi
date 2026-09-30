@@ -41,10 +41,11 @@
             reg = <0x00000000 0x000F8000>;
         };
 
+        /* Rest of the 16Mbit (2MB) Flash */
         storage_partition: partition@f8000 {
             compatible = "zephyr,mapped-partition";
             label = "storage";
-            reg = <0x000F8000 0x00100000>;
+            reg = <0x000F8000 0x00F08000>;
         };
     };
 };

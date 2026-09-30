@@ -16,7 +16,7 @@
     buttons {
         compatible = "gpio-keys";
         buttonA: buttonA {
-			gpios = <&feather_header 14 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+			gpios = <&feather_header 16 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
             label = "Push button switch A";
         };
     };
