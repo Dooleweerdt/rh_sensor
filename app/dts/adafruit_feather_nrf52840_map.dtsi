@@ -21,31 +21,31 @@
         slot0_partition: partition@10000 {
             compatible = "zephyr,mapped-partition";
             label = "image-0";
-            reg = <0x00010000 0x000F8000>;
+            reg = <0x00010000 0x000E8000>;
         };
 
-        /* 3. Storage partition from 0xF8000 -> 0xFFFFF
+        /* 3. Storage partition from 0xF8000 -> 0xFFFFF */
     };
 };
 
 &gd25q16 {
+    status = "okay";
     partitions {
-        ranges;
+        compatible = "fixed-partitions";
         #address-cells = <1>;
         #size-cells = <1>;
 
         /* This becomes your MCUboot secondary slot */
         slot1_partition: partition@0 {
-            compatible = "zephyr,mapped-partition";
             label = "image-1";
-            reg = <0x00000000 0x000F8000>;
+            reg = <0x00000000 0x000E8000>;
         };
 
         /* Rest of the 16Mbit (2MB) Flash */
-        storage_partition: partition@f8000 {
-            compatible = "zephyr,mapped-partition";
+        ext_storage_partition: partition@e8000 {
             label = "storage";
-            reg = <0x000F8000 0x00F08000>;
+            reg = <0x000E8000 0x00118000>;
         };
     };
 };
+
