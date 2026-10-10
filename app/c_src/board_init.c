@@ -8,6 +8,7 @@
 #include <zephyr/drivers/display.h>
 #include <zephyr/display/cfb.h>
 #include <app/smp_ble.h>
+#include <zephyr/linker/linker-defs.h>
 
 #include <app_version.h>
 
@@ -29,6 +30,7 @@ const struct device *display_dev = DEVICE_DT_GET(DISPLAY_DRIVER);
 int board_init(void)
 {
     printk("Zephyr - RH Sensor in Rust %s\n", STRINGIFY(APP_BUILD_VERSION));
+	printk("Application address %p\n", (void *)__rom_region_start);
 
     #if CONFIG_DISPLAY
     if (!device_is_ready(display_dev)) {
@@ -45,7 +47,7 @@ int board_init(void)
 
     #if CONFIG_LVGL
     lv_obj_t * label1 = lv_label_create(lv_scr_act());
-    lv_label_set_text(label1, "Zephyr LVGL!");
+    lv_label_set_text(label1, "Zephyr RH 3 ");
     lv_obj_align(label1, LV_ALIGN_TOP_LEFT, 0, 0);
     lv_timer_handler();
     #else
