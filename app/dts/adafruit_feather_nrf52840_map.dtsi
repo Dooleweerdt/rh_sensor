@@ -35,16 +35,16 @@
         #address-cells = <1>;
         #size-cells = <1>;
 
-        /* This becomes your MCUboot secondary slot */
+        /* MCUboot secondary slot - One page larger than slot0 (swap page) */
         slot1_partition: partition@0 {
             label = "image-1";
-            reg = <0x00000000 0x000E8000>;
+            reg = <0x00000000 0x000E9000>;
         };
 
         /* Rest of the 16Mbit (2MB) Flash */
-        ext_storage_partition: partition@e8000 {
-            label = "storage";
-            reg = <0x000E8000 0x00118000>;
+        ext_storage_partition: partition@E9000 {
+            label = "ext_storage";
+            reg = <0x000F0000 0x00118000>;
         };
     };
 };
