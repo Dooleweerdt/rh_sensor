@@ -2,7 +2,7 @@
 / {
     aliases {
         mcuboot-led0 = &blue_led;
-        mcuboot-button0 = &user_button1;
+        mcuboot-button0 = &boot_pin;
     };
 
     chosen {
@@ -17,6 +17,16 @@
 		blue_led: led_0 {
 			gpios = <&gpio0 10 GPIO_ACTIVE_HIGH>;
 			label = "Blue LED";
+		};
+	};
+
+	keys {
+		compatible = "gpio-keys";
+
+		boot_pin: boot_pin_3  {
+			label = "BootPin";
+			gpios = <&gpio0 3 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+			//zephyr,code = <INPUT_KEY_0>;
 		};
 	};
 };
