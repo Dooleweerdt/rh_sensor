@@ -1,0 +1,26 @@
+
+/ {
+    aliases {
+        mcuboot-led0 = &blue_led;
+        mcuboot-button0 = &user_button1;
+    };
+
+    chosen {
+        zephyr,code-partition = &boot_partition;
+        zephyr,boot-serial-uart = &usb_serial;
+    };
+
+
+	leds {
+		compatible = "gpio-leds";
+
+		blue_led: led_0 {
+			gpios = <&gpio0 10 GPIO_ACTIVE_HIGH>;
+			label = "Blue LED";
+		};
+	};
+};
+
+&usb_serial {
+	status = "okay";
+};

@@ -19,7 +19,7 @@ target_sources(app PRIVATE c_src/main.c)
 target_sources(app PRIVATE c_src/board_init.c)
 target_sources(app PRIVATE c_src/rht_sensor_init.c)
 target_sources(app PRIVATE c_src/zbus_bridge.c)
-target_sources(app PRIVATE c_src/smp_ble.c)
+target_sources_ifdef(CONFIG_BT app PRIVATE c_src/smp_ble.c)
 
 target_sources_ifdef(CONFIG_WIFI app PRIVATE c_src/wifi_bridge.c)
 target_sources_ifdef(CONFIG_WIFI app PRIVATE c_src/mqtt_bridge.c)

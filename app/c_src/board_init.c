@@ -49,6 +49,9 @@ int board_init(void)
     lv_obj_t * label1 = lv_label_create(lv_scr_act());
     lv_label_set_text(label1, "Zephyr RH 3 ");
     lv_obj_align(label1, LV_ALIGN_TOP_LEFT, 0, 0);
+    lv_obj_t * label2 = lv_label_create(lv_scr_act());
+    lv_label_set_text(label2, STRINGIFY(APP_BUILD_VERSION));
+    lv_obj_align(label2, LV_ALIGN_BOTTOM_LEFT, 0, 0);
     lv_timer_handler();
     #else
     // Initialize the CFB (Character Frame Buffer)
@@ -68,8 +71,10 @@ int board_init(void)
     #endif // CONFIG_LVGL
     #endif // CONFIG_DISPLAY
 
+    #if CONFIG_BT
 	init_smp_ble();
-    
+    #endif
+
     return 0;
 }
 
