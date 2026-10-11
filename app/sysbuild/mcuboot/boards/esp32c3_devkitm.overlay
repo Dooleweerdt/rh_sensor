@@ -26,7 +26,6 @@
 		boot_pin: boot_pin_3  {
 			label = "BootPin";
 			gpios = <&gpio0 3 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
-			//zephyr,code = <INPUT_KEY_0>;
 		};
 	};
 };
