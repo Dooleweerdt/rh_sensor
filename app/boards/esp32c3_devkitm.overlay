@@ -12,6 +12,7 @@
 / {
 	aliases {
 		led0 = &blue_led;
+		userbutton = &user_button1;
 	};
 
 	example_sensor: example-sensor {

@@ -23,6 +23,7 @@ use core::ptr::addr_of_mut;
 use driver::rht_sensor::RhtSensor;
 use driver::rht_sensor::SensorChannel;
 use driver::gpio_blink::GpioBlink;
+use driver::button_usr::UserButton;
 use application::blink::Blink;
 use mqtt::MqttTransport;
 
@@ -81,6 +82,14 @@ fn do_blink() {
         }
     }
 
+    // Button setup:
+    let btn = zephyr::devicetree::aliases::userbutton::get_instance().unwrap();
+    if !btn.is_ready() {
+        info!("Button is not ready");
+        loop {};
+    }
+    let usr_btn = UserButton::new(btn);
+
     #[cfg(CONFIG_WIFI)]
     unsafe {
         static mut NETWORK_CHANNEL: Option<MqttTransport> = None;
@@ -91,7 +100,7 @@ fn do_blink() {
         comm::spawn_comm_thread(transport_ref, 10);
     }
 
-    application::start(sensors);
+    application::start(sensors, usr_btn);
 }
 
 #[cfg(not(dt = "aliases::led0"))]

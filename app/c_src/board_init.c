@@ -7,7 +7,6 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/drivers/display.h>
 #include <zephyr/display/cfb.h>
-#include <app/smp_ble.h>
 #include <zephyr/linker/linker-defs.h>
 
 #include <app_version.h>
@@ -70,10 +69,6 @@ int board_init(void)
     cfb_framebuffer_finalize(display_dev);
     #endif // CONFIG_LVGL
     #endif // CONFIG_DISPLAY
-
-    #if CONFIG_BT
-	init_smp_ble();
-    #endif
 
     return 0;
 }

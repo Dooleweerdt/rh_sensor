@@ -1,4 +1,5 @@
 pub mod blink;
+pub mod button;
 
 use log::info;
 use zephyr::time::{sleep, Duration};
@@ -6,10 +7,13 @@ use alloc::vec::Vec;
 
 use crate::driver::rht_sensor::RhtSensor;
 use crate::driver::rht_sensor::SensorChannel;
+use crate::driver::button_usr::UserButton;
+use crate::application::button::Button;
 
 // Use Rust pointer syntax - not C style!
 unsafe extern "C" {
     fn zbus_bridge_publish_rht(msg: *const SensorMsg) -> i32;
+    fn init_smp_ble() -> i32;
 }
 
 pub const ID_SHT3X: u32 = 0;
@@ -30,10 +34,22 @@ pub fn broadcast_data(msg: *const SensorMsg) {
     }
 }
 
-pub fn start (mut sensors: Vec<RhtSensor>) {
+pub fn start (mut sensors: Vec<RhtSensor>, mut button: UserButton) {
     let duration = Duration::millis_at_least(30000);
 
     loop {
+        if button.is_pressed() {
+            info!("Button Pressed!");
+            #[cfg(CONFIG_BT)]
+	        unsafe {
+                init_smp_ble();
+            }
+            loop {
+                sleep(duration);
+            }
+            // Now in FWU state - BLE IF activated!
+        }
+
         for s in &mut sensors {
             let id = match s.name {"SHT3x" => ID_SHT3X, "DS18B20" => ID_ONEWIRE, _ => ID_MOCK};
             let mut sensor_data = SensorMsg { source: id, temp: 0.0, hum: 0.0 };
