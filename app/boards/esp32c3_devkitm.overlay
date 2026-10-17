@@ -56,7 +56,7 @@
 	sht3xd:sht3xd@45 {
 		compatible = "sensirion,sht3xd";
 		reg = <0x45>; /* ADDR pin pulled high, else 0x44 */
-		alert-gpios = <&gpio0 1 GPIO_ACTIVE_HIGH>;
+		//alert-gpios = <&gpio0 1 GPIO_ACTIVE_HIGH>; - Only used in polling, so remove IRQ pin.
 	};
 };
 

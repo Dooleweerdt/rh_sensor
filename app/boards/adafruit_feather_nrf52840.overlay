@@ -22,17 +22,20 @@
 		compatible = "gpio-keys";
 
 		buttonA: button_A {
-			gpios = <&feather_header 16 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+			//gpios = <&feather_header 16 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>; feather_header can't be mapped into dt-rust.yml... ToDo...?
+			gpios = <&gpio0 26 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
 			label = "Push button switch A";
 		};
 
 		buttonB: button_B {
-			gpios = <&feather_header 15 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+			//gpios = <&feather_header 15 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+			gpios = <&gpio0 7 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
 			label = "Push button switch B";
 		};
 
 		buttonC: button_C {
-			gpios = <&feather_header 14 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+			//gpios = <&feather_header 14 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+			gpios = <&gpio1 8 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
 			label = "Push button switch C";
 		};
 	};
@@ -43,6 +46,10 @@
 		zephyr,flash = &flash0;
 		zephyr,code-partition = &slot0_partition;
         zephyr,display = &ssd1306_ssd1306_128x32;
+	};
+	
+	aliases {
+		userbutton = &buttonB;
 	};
 };
 
@@ -56,7 +63,7 @@
 	sht3xd:sht3xd@45 {
 		compatible = "sensirion,sht3xd";
 		reg = <0x45>; /* ADDR pin pulled high, else 0x44 */
-		alert-gpios = <&gpio1 8 GPIO_ACTIVE_HIGH>;
+		//alert-gpios = <&gpio1 8 GPIO_ACTIVE_HIGH>; Disable IRQ pin - only used with polling
 	};
 };
 
