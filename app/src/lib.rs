@@ -37,6 +37,8 @@ unsafe extern "C" {
     fn get_demo_sensor_device() -> *const device;
 }
 
+// Bring in the Zephyr panic handler.
+use zephyr_panic as _;
 
 #[unsafe(no_mangle)]
 extern "C" fn rust_main() {

@@ -14,6 +14,7 @@ crate-type = ["staticlib"]
 
 [dependencies]
 zephyr = "0.1.0"
+zephyr-panic = "0.1.0"
 log = "0.4.22"
 zephyr-sys = { version = "0.1.0", path = "../../modules/lang/rust/zephyr-sys" }
 serde = { version = "1.0", default-features = false, features = ["derive"] }

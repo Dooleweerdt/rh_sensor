@@ -460,6 +460,7 @@ dependencies = [
  "serde-json-core",
  "zephyr",
  "zephyr-build",
+ "zephyr-panic",
  "zephyr-sys",
 ]
 
@@ -653,9 +654,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "zephyr-panic"
+version = "0.1.0"
+dependencies = [
+ "zephyr",
+ "zephyr-build",
+]
+
+[[package]]
 name = "zephyr-sys"
 version = "0.1.0"
 dependencies = [
  "anyhow",
  "bindgen",
+ "zephyr-build",
 ]

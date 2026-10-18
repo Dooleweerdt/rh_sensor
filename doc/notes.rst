@@ -51,9 +51,10 @@ In wrapper.h add:
 In build.rs add:
 
 .. code-block:: rust
-    
-    .allowlist_function("sensor\_.*")
-    .allowlist_item("SENSOR\_.*")
+
+    .allowlist_item_if("CONFIG_SENSOR_.*", || options.contains("CONFIG_SENSOR"))
+    .allowlist_item_if("SENSOR_.*", || options.contains("CONFIG_SENSOR"))
+    .allowlist_function_if("sensor_.*", || options.contains("CONFIG_SENSOR"))
 
 
 ----------------
