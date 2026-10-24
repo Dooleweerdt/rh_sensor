@@ -46,6 +46,8 @@ impl RhtSensor {
             SensorChannel::Humidity => sensor_channel_SENSOR_CHAN_HUMIDITY,
         };
 
+        // SAFETY:
+        // Calls unsafe functions from Zephyr-sys crate
         unsafe {
             let ret = sensor_sample_fetch(self.dev);
             if ret != 0 {
@@ -60,9 +62,6 @@ impl RhtSensor {
             }
 
         }
-        // info!(" - - - - ");
-        // info!("Sensor: {}", self.name);
-        // info!("Sensor reading: {}.{} %%", val.val1, val.val2);
         Ok(val.val1 as f32 + (val.val2 as f32 / 1_000_000.0))
     }
 }

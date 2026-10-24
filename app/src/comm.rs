@@ -1,6 +1,6 @@
 use crate::application::SensorMsg;
 use zephyr::thread::{ThreadData, ThreadStack, ReadyThread};
-use core::ffi::{c_void, CStr};
+use core::ffi::{c_void};
 use core::ptr::addr_of_mut;
 use log::info;
 
@@ -9,15 +9,16 @@ unsafe extern "C" {
     static wifi_sub: core::ffi::c_void;
 }
 
-/// This fetches the ZBUS_SUBSCRIBER_DEFINE(wifi_sub) in bridge.c
 pub fn get_sub_ptr() -> *const core::ffi::c_void {
+    // SAFETY:
+    // This fetches the ZBUS_SUBSCRIBER_DEFINE(wifi_sub) in bridge.c
     unsafe { &wifi_sub as *const _ }
 }
 
 #[derive(Debug, Clone, Copy)]
 pub enum CommError {
-    ConnectionFailed,
-    SerializationFailed,
+    NoConnection,
+    SerializationFail,
     SendFailed,
 }
 
@@ -49,7 +50,8 @@ impl <T: DataTransport + 'static + ?Sized> CommInterface<T>
 
         loop {
             // This blocks the thread. No semaphore needed!
-            // - It specifically waits for the 'wifi_lis' subscriber defined in C.
+            // SAFETY:
+            // It specifically waits for the 'wifi_lis' subscriber defined in C.
             let ret = unsafe { zbus_bridge_wait_read(get_sub_ptr(), &mut chan_ptr, &mut msg) };
 
             if ret == 0 {
@@ -79,6 +81,8 @@ static mut COMM_INTERFACE_STORAGE: Option<CommInterface<dyn DataTransport>> = No
 extern "C" fn comm_runner(p1: *mut c_void, _p2: *mut c_void, _p3: *mut c_void) {
     // p1 points directly to the UnsafeCell container managed by ThreadData.
     // Zephyr-thread.rs module passes the init data pointer as the first argument to k_thread_create.
+    // SAFETY:
+    // Function is called from c, with unsafe pointers - zephyr-sys (task function)
     unsafe {
         let init_data_ptr = p1 as *mut Option<usize>;
         if let Some(interface_address) = *init_data_ptr {
@@ -90,12 +94,14 @@ extern "C" fn comm_runner(p1: *mut c_void, _p2: *mut c_void, _p3: *mut c_void) {
     }
 }
 
-pub fn spawn_comm_thread<T: DataTransport>(transport: &'static mut T, priority: i32) 
+pub fn spawn_comm_thread<T>(transport: &'static mut T, priority: i32) 
 where 
     T: DataTransport + 'static,
 {
-    let thread_name = CStr::from_bytes_with_nul(b"comm_runner\0").unwrap();
+    let thread_name = c"comm_runner";
 
+    // SAFETY:
+    // Doing pointer stuff makes this unsafe - To be investigated!
     unsafe {
         let comm_if: &'static mut dyn DataTransport = transport;
         COMM_INTERFACE_STORAGE = Some(CommInterface::new(comm_if));

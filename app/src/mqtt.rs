@@ -39,7 +39,7 @@ impl MqttTransport {
         Self { 
             broker_address, 
             connected_flag : false, 
-            led: led,
+            led,
         }
     }
 }
@@ -47,15 +47,17 @@ impl MqttTransport {
 #[cfg(CONFIG_WIFI)]
 impl DataTransport for MqttTransport {
     fn connect(&mut self) -> Result<(), CommError> {
+        // SAFETY:
+        // Initialize WiFi using c-functions (wifi-bridge.c)
         unsafe {
-            if self.connected_flag == false {
+            if !self.connected_flag {
                 wifi_init();
                 let ssid = wifi_bridge_get_ssid();
                 let psk = wifi_bridge_get_psk();
                 let status = wifi_connect(ssid, psk);
                 if status < 0 {
                     info!("Wifi connection error");
-                    return Err(CommError::ConnectionFailed);
+                    return Err(CommError::NoConnection);
                 }
                 
                 wifi_wait_for_ip_addr();
@@ -79,7 +81,7 @@ impl DataTransport for MqttTransport {
         };
 
         let mut buf = [0u8; 128];
-        let bytes_written = serde_json_core::to_slice(&wire_payload, &mut buf).map_err(|_| CommError::SerializationFailed)?;
+        let bytes_written = serde_json_core::to_slice(&wire_payload, &mut buf).map_err(|_| CommError::SerializationFail)?;
 
         if let Ok(json_str) = core::str::from_utf8(&buf[..bytes_written]) {
             info!("Successfully generated JSON payload: {}", json_str);
@@ -87,6 +89,8 @@ impl DataTransport for MqttTransport {
 
         info!("Sending MQTT payload: source={}, temp={}C, hum={}%", wire_payload.source, wire_payload.temperature, wire_payload.humidity);
 
+        // SAFETY:
+        // Call c-functions through mqtt.bridge
         unsafe {
             if mqtt_bridge_send_data(buf.as_ptr(),bytes_written) != 0 {
                 info!("MQTT Send error!");

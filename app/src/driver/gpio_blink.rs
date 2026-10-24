@@ -9,7 +9,9 @@ use core::pin::Pin;
 #[cfg(CONFIG_RUST_ALLOC)]
 use alloc::boxed::Box;
 
-use crate::application::blink::Blink; 
+use crate::application::blink::Blink;
+
+type InnerTimer = Option<Pin<Box<CallbackTimer<Arc<BlinkInner>>>>>;
 
 pub struct GpioBlink {
     inner: Arc<BlinkInner>,
@@ -17,7 +19,7 @@ pub struct GpioBlink {
 
 pub struct BlinkInner {
     led: SpinMutex<GpioPin>,
-    timer: SpinMutex<Option<Pin<Box<CallbackTimer<Arc<BlinkInner>>>>>>,
+    timer: SpinMutex<InnerTimer>,
 }
 
 impl GpioBlink {
@@ -41,7 +43,7 @@ impl Blink for GpioBlink {
         /*if let Some(running_timer) = guard.take() {
             running_timer.as_mut().stop();
         }*/
-        let tm_stopped: StoppedTimer = if let Some(mut running_timer) = guard.take() {
+        let tm_stopped: StoppedTimer = if let Some(running_timer) = guard.take() {
             // SAFETY: We are immediately passing the unpinned `CallbackTimer` to `.stop()`, 
             // which deregisters it from Zephyr's C kernel before it can ever move in RAM.
             let boxed_timer = unsafe { Pin::into_inner_unchecked(running_timer) };
@@ -66,11 +68,13 @@ impl Blink for GpioBlink {
         Ok(())
     }
 
-    fn set_blink_off(&mut self) -> Result<(), i32> {
-        Err(-1)
-    }
+    //fn set_blink_off(&mut self) -> Result<(), i32> {
+    //    Err(-1)
+    //}
 }
 
 // Thread-safety guarantees for the Zephyr timer
+// SAFETY: Required... TBD...
 unsafe impl Sync for BlinkInner {}
+// SAFETY: Required... TBD...
 unsafe impl Send for BlinkInner {}

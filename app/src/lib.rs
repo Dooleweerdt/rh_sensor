@@ -42,6 +42,8 @@ use zephyr_panic as _;
 
 #[unsafe(no_mangle)]
 extern "C" fn rust_main() {
+    // SAFETY:
+    // Unclear why this is unsafe?
     unsafe {
         zephyr::set_logger().unwrap();
     }
@@ -58,8 +60,7 @@ fn do_blink() {
     let mut led0 = zephyr::devicetree::aliases::led0::get_instance().unwrap();
 
     if !led0.is_ready() {
-        info!("LED is not ready");
-        loop {};
+        panic!("LED is not ready");
     }
 
     led0.configure(ZR_GPIO_OUTPUT_ACTIVE);
@@ -69,6 +70,8 @@ fn do_blink() {
     // Create a "List" of different sensors (Trait Objects)
     let mut sensors = Vec::new();
 
+    // SAFETY:
+    // Not sure why this is unsafe?
     unsafe {
         if let Some(sht3x) = RhtSensor::new(get_sht3x_device(), "SHT3X", &[SensorChannel::Temperature, SensorChannel::Humidity]) {
             sensors.push(sht3x);
@@ -77,22 +80,22 @@ fn do_blink() {
             sensors.push(ds18b20);
         }
 
-        if sensors.is_empty() {
-            if let Some(demo_sensor) = RhtSensor::new(get_demo_sensor_device(), "Mock Sensor", &[SensorChannel::Temperature, SensorChannel::Humidity]) {
+        if sensors.is_empty()
+            && let Some(demo_sensor) = RhtSensor::new(get_demo_sensor_device(), "Mock Sensor", &[SensorChannel::Temperature, SensorChannel::Humidity]) {
                 sensors.push(demo_sensor);
             }
-        }
     }
 
     // Button setup:
     let btn = zephyr::devicetree::aliases::userbutton::get_instance().unwrap();
     if !btn.is_ready() {
-        info!("Button is not ready");
-        loop {};
+        panic!("Button is not ready");
     }
     let usr_btn = UserButton::new(btn);
 
     #[cfg(CONFIG_WIFI)]
+    // SAFETY:
+    // Call to the unsafe spawn_comm_thread function, which does some pointer magic... TBD...
     unsafe {
         static mut NETWORK_CHANNEL: Option<MqttTransport> = None;
         NETWORK_CHANNEL = Some(MqttTransport::new("192.168.1.21", gpio_blink));

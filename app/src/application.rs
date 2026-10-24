@@ -29,6 +29,8 @@ pub struct SensorMsg {
 }
 
 pub fn broadcast_data(msg: *const SensorMsg) {
+    // SAFETY:
+    // Calls unsafe c-functions in zbus_bridge.c
     unsafe {
         zbus_bridge_publish_rht(msg);
     }
@@ -41,7 +43,9 @@ pub fn start (mut sensors: Vec<RhtSensor>, mut button: UserButton) {
         if button.is_pressed() {
             info!("Button Pressed!");
             #[cfg(CONFIG_BT)]
-	        unsafe {
+	        // SAFETY:
+            // Calls unsafe c-functions in smp_ble.c
+            unsafe {
                 init_smp_ble();
             }
             loop {
