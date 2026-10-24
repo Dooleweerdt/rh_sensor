@@ -10,7 +10,10 @@
 
 mod driver;
 mod application;
+
+#[cfg(CONFIG_WIFI)]
 mod comm;
+#[cfg(CONFIG_WIFI)]
 mod mqtt;
 extern crate alloc;
 
@@ -18,6 +21,7 @@ use log::info;
 use zephyr::raw::ZR_GPIO_OUTPUT_ACTIVE;
 use zephyr_sys::device;
 use alloc::vec::Vec;
+#[cfg(CONFIG_WIFI)]
 use core::ptr::addr_of_mut;
 
 use driver::rht_sensor::RhtSensor;
@@ -25,6 +29,8 @@ use driver::rht_sensor::SensorChannel;
 use driver::gpio_blink::GpioBlink;
 use driver::button_usr::UserButton;
 use application::blink::Blink;
+
+#[cfg(CONFIG_WIFI)]
 use mqtt::MqttTransport;
 
 #[cfg(not(dt = "aliases::led0"))]
@@ -71,7 +77,7 @@ fn do_blink() {
     let mut sensors = Vec::new();
 
     // SAFETY:
-    // Not sure why this is unsafe?
+    // Calls external c functions to get device handles using devicetree macros.
     unsafe {
         if let Some(sht3x) = RhtSensor::new(get_sht3x_device(), "SHT3X", &[SensorChannel::Temperature, SensorChannel::Humidity]) {
             sensors.push(sht3x);
