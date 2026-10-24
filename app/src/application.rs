@@ -38,6 +38,7 @@ pub fn broadcast_data(msg: *const SensorMsg) {
 
 pub fn start (mut sensors: Vec<RhtSensor>, mut button: UserButton) {
     let duration = Duration::millis_at_least(30000);
+    let sense_delay = Duration::millis_at_least(1000);
 
     loop {
         if button.is_pressed() {
@@ -69,6 +70,9 @@ pub fn start (mut sensors: Vec<RhtSensor>, mut button: UserButton) {
 
             // Send data on zbus to subscribers (wifi, display, etc.)
             broadcast_data(&sensor_data);
+
+            // ZBus overwrites the broadcasted message -> Try with a small delay between sensors
+            sleep(sense_delay);
         }
 
         sleep(duration);
