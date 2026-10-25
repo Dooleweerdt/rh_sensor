@@ -18,7 +18,7 @@ mod mqtt;
 extern crate alloc;
 
 use log::info;
-use zephyr::raw::ZR_GPIO_OUTPUT_ACTIVE;
+use zephyr::raw::{ZR_GPIO_OUTPUT_ACTIVE, ZR_GPIO_INPUT, GPIO_PULL_UP};
 use zephyr_sys::device;
 use alloc::vec::Vec;
 #[cfg(CONFIG_WIFI)]
@@ -92,8 +92,9 @@ fn do_blink() {
             }
     }
 
-    // Button setup:
-    let btn = zephyr::devicetree::aliases::userbutton::get_instance().unwrap();
+    // Button setup: (Duplicate of zephyr GPIO setup in DeviceTree? - TBD...)
+    let mut btn = zephyr::devicetree::aliases::userbutton::get_instance().unwrap();
+    btn.configure(ZR_GPIO_INPUT | GPIO_PULL_UP);
     if !btn.is_ready() {
         panic!("Button is not ready");
     }

@@ -60,6 +60,7 @@
 };
 
 &i2c0 { /* SDA P0.12, SCL P0.11, Alert P1.08 */
+	status = "okay";
 	sht3xd:sht3xd@45 {
 		compatible = "sensirion,sht3xd";
 		reg = <0x45>; /* ADDR pin pulled high, else 0x44 */
