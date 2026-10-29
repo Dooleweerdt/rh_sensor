@@ -6,6 +6,7 @@ pub struct UserButton {
     btn: GpioPin,
 }
 
+#[cfg(dt = "aliases::userbutton")]
 impl UserButton {
     pub fn new (pin: GpioPin) -> Self {
         Self{btn: pin}

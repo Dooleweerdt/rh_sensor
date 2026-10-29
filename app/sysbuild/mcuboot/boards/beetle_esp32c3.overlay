@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2026 Dooleweerdt
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
 / {
     aliases {
@@ -10,15 +14,6 @@
         zephyr,boot-serial-uart = &usb_serial;
     };
 
-
-	leds {
-		compatible = "gpio-leds";
-
-		blue_led: led_0 {
-			gpios = <&gpio0 10 GPIO_ACTIVE_HIGH>;
-			label = "Blue LED";
-		};
-	};
 
 	keys {
 		compatible = "gpio-keys";

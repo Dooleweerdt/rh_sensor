@@ -21,6 +21,7 @@ use log::info;
 use zephyr::raw::{ZR_GPIO_OUTPUT_ACTIVE, ZR_GPIO_INPUT, GPIO_PULL_UP};
 use zephyr_sys::device;
 use alloc::vec::Vec;
+
 #[cfg(CONFIG_WIFI)]
 use core::ptr::addr_of_mut;
 
@@ -92,13 +93,19 @@ fn do_blink() {
             }
     }
 
-    // Button setup: (Duplicate of zephyr GPIO setup in DeviceTree? - TBD...)
-    let mut btn = zephyr::devicetree::aliases::userbutton::get_instance().unwrap();
-    btn.configure(ZR_GPIO_INPUT | GPIO_PULL_UP);
-    if !btn.is_ready() {
-        panic!("Button is not ready");
+    #[cfg(dt = "aliases::userbutton")]
+    {
+        // Button setup: (Duplicate of zephyr GPIO setup in DeviceTree? - TBD...)
+        let btn = zephyr::devicetree::aliases::userbutton::get_instance().unwrap();
+        btn.configure(ZR_GPIO_INPUT | GPIO_PULL_UP);
+        if !btn.is_ready() {
+            panic!("Button is not ready");
+        }
+        let usr_btn = UserButton::new(btn);
     }
-    let usr_btn = UserButton::new(btn);
+    
+    #[cfg(not(dt = "aliases::userbutton"))]
+    let usr_btn: Option<UserButton> = None;
 
     #[cfg(CONFIG_WIFI)]
     // SAFETY:

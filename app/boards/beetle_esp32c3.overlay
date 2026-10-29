@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Nordic Semiconductor ASA
+ * Copyright (c) 2026 Dooleweerdt
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -12,21 +12,12 @@
 / {
 	aliases {
 		led0 = &blue_led;
-		userbutton = &user_button1;
+		//userbutton = &user_button1;
 	};
 
 	example_sensor: example-sensor {
 		compatible = "zephyr,example-sensor";
 		input-gpios = <&gpio0 7 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
-	};
-
-	leds {
-		compatible = "gpio-leds";
-
-		blue_led: led_0 {
-			gpios = <&gpio0 10 GPIO_ACTIVE_HIGH>;
-			label = "Blue LED";
-		};
 	};
 
     /* Define the 1-Wire bus at the root level */
