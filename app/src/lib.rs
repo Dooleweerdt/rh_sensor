@@ -18,7 +18,10 @@ mod mqtt;
 extern crate alloc;
 
 use log::info;
+#[cfg(dt = "aliases::userbutton")]
 use zephyr::raw::{ZR_GPIO_OUTPUT_ACTIVE, ZR_GPIO_INPUT, GPIO_PULL_UP};
+#[cfg(not(dt = "aliases::userbutton"))]
+use zephyr::raw::{ZR_GPIO_OUTPUT_ACTIVE};
 use zephyr_sys::device;
 use alloc::vec::Vec;
 
