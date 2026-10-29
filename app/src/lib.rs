@@ -97,16 +97,20 @@ fn do_blink() {
     }
 
     #[cfg(dt = "aliases::userbutton")]
+    let mut btn = zephyr::devicetree::aliases::userbutton::get_instance().unwrap();
+    
+    #[cfg(dt = "aliases::userbutton")] 
     {
         // Button setup: (Duplicate of zephyr GPIO setup in DeviceTree? - TBD...)
-        let btn = zephyr::devicetree::aliases::userbutton::get_instance().unwrap();
         btn.configure(ZR_GPIO_INPUT | GPIO_PULL_UP);
         if !btn.is_ready() {
             panic!("Button is not ready");
         }
-        let usr_btn = UserButton::new(btn);
     }
-    
+
+    #[cfg(dt = "aliases::userbutton")]
+    let usr_btn = Some(UserButton::new(btn));
+
     #[cfg(not(dt = "aliases::userbutton"))]
     let usr_btn: Option<UserButton> = None;
 
