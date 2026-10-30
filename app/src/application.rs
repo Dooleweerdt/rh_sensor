@@ -36,15 +36,15 @@ pub fn broadcast_data(msg: *const SensorMsg) {
     }
 }
 
-pub fn start (mut sensors: Vec<RhtSensor>, button: Option<UserButton>) {
+pub fn start (mut sensors: Vec<RhtSensor>, mut button: Option<UserButton>) {
     let duration = Duration::millis_at_least(30000);
     let sense_delay = Duration::millis_at_least(1000);
 
     let btn_present: bool = button.is_some();
-    let mut btn: UserButton = button.unwrap();
+    //let mut btn: UserButton = button.unwrap();
 
     loop {
-        if btn_present && btn.is_pressed() {
+        if btn_present && let Some(ref mut btn) = button && btn.is_pressed() {
             info!("Button Pressed!");
             #[cfg(CONFIG_BT)]
 	        // SAFETY:
