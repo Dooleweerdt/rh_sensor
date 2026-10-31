@@ -9,7 +9,7 @@
 #include <zephyr/display/cfb.h>
 #include <zephyr/linker/linker-defs.h>
 
-#include <app_version.h>
+#include <zephyr/app_version.h>
 
 LOG_MODULE_REGISTER(board_init, CONFIG_APP_LOG_LEVEL);
 
