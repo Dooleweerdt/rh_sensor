@@ -14,14 +14,14 @@
         boot_partition: partition@0 {
             compatible = "zephyr,mapped-partition";
             label = "mcuboot";
-            reg = <0x00000000 0x00010000>;
+            reg = <0x00000000 0x00012000>;
         };
 
-        /* 2. Slot 0 starts at 0x10000 and uses remaining internal flash */
-        slot0_partition: partition@10000 {
+        /* 2. Slot 0 starts at 0x12000 and uses remaining internal flash */
+        slot0_partition: partition@12000 {
             compatible = "zephyr,mapped-partition";
             label = "image-0";
-            reg = <0x00010000 0x000E8000>;
+            reg = <0x00012000 0x000E6000>;
         };
 
         /* 3. Storage partition from 0xF8000 -> 0xFFFFF */
@@ -38,13 +38,13 @@
         /* MCUboot secondary slot - One page larger than slot0 (swap page) */
         slot1_partition: partition@0 {
             label = "image-1";
-            reg = <0x00000000 0x000E9000>;
+            reg = <0x00000000 0x000E7000>;
         };
 
         /* Rest of the 16Mbit (2MB) Flash */
-        ext_storage_partition: partition@E9000 {
+        ext_storage_partition: partition@E7000 {
             label = "ext_storage";
-            reg = <0x000E9000 0x00117000>;
+            reg = <0x000E7000 0x00117000>;
         };
     };
 };
