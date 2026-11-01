@@ -10,7 +10,7 @@
         /delete-node/ partition@c000;
         /delete-node/ partition@82000;
 
-        /* 1. MCUboot partition increased to 64KB (0x10000) */
+        /* 1. MCUboot partition increased to 64KB (0x12000) */
         boot_partition: partition@0 {
             compatible = "zephyr,mapped-partition";
             label = "mcuboot";

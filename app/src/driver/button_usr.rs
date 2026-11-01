@@ -15,6 +15,6 @@ impl UserButton {
 
 impl Button for UserButton {
     fn is_pressed(&mut self) -> bool {
-       !self.btn.get()  
+       self.btn.get()  
     }
 }
