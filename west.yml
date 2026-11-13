@@ -16,8 +16,11 @@ manifest:
   projects:
     - name: zephyr
       remote: zephyr-downstream
+      #revision: fix_pyocd
       #revision: 684c9e8f32e4373a21098559f748f06915f950c9 #v4.4.0
       revision: v4.5.0
+      #revision: 545fb948fe7 # Last know-good, before the commit below.
+      #revision: 6d69698de748e9bbc39e655b38db3c889b385d7c # Failed due to NET_BUF vs RINGBUF
       import:
         # By using name-allowlist we can clone only the modules that are
         # strictly needed by the application.
