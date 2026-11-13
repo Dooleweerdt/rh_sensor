@@ -60,7 +60,7 @@ impl Blink for GpioBlink {
         };
             
         let delay = NoWait;
-        let d = Duration::from_ticks(period_ms.into());
+        let d = Duration::millis(period_ms.into());
 
         // Make sure to store the return value, so it doesn't go out of scope...
         *guard = Some(tm_stopped.start_callback(cb, delay, d)); 
