@@ -41,7 +41,7 @@ impl <T: DataTransport + 'static + ?Sized> CommInterface<T>
     }
 
     pub fn run(&mut self) {
-        let mut msg = SensorMsg { source: 0, temp: 0.0, hum: 0.0 };
+        let mut msg = SensorMsg { name: "NoSensor".as_bytes().as_ptr(), name_len:8, temp: 0.0, hum: 0.0 };
 
         log::info!("Communication thread started (Wi-Fi/BT ready)");
         

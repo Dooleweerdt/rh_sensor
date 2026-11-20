@@ -10,7 +10,6 @@ use core::ffi::c_void;
 
 #[derive(Serialize)]
 struct MqttPayload {
-    source: u32,
     temperature: f32,
     humidity: f32,
 }
@@ -25,7 +24,7 @@ unsafe extern "C" {
 
 unsafe extern "C" {
     fn mqtt_bridge_connect() -> i32;
-    fn mqtt_bridge_send_data(data: *const u8, len: usize) -> i32;
+    fn mqtt_bridge_send_data(topic: *const u8, tp_len: usize, data: *const u8, dt_len: usize) -> i32;
 }
 
 pub struct MqttTransport {
@@ -75,24 +74,23 @@ impl DataTransport for MqttTransport {
 
     fn send_data(&mut self, msg: &SensorMsg) -> Result<(), CommError> {
         let wire_payload = MqttPayload {
-            source: msg.source,
             humidity: msg.hum,
             temperature: msg.temp,
         };
 
-        let mut buf = [0u8; 128];
-        let bytes_written = serde_json_core::to_slice(&wire_payload, &mut buf).map_err(|_| CommError::SerializationFail)?;
+        let mut buf_data = [0u8; 128];
+        let bytes_written = serde_json_core::to_slice(&wire_payload, &mut buf_data).map_err(|_| CommError::SerializationFail)?;
 
-        if let Ok(json_str) = core::str::from_utf8(&buf[..bytes_written]) {
-            info!("Successfully generated JSON payload: {}", json_str);
+        if let Ok(json_str) = core::str::from_utf8(&buf_data[..bytes_written]) {
+            info!("Successfully generated JSON payload: {} for topic: {}", json_str, "Topic");
         }
 
-        info!("Sending MQTT payload: source={}, temp={}C, hum={}%", wire_payload.source, wire_payload.temperature, wire_payload.humidity);
+        info!("Sending MQTT payload: source={}, temp={}C, hum={}%", "Topic", wire_payload.temperature, wire_payload.humidity);
 
         // SAFETY:
         // Call c-functions through mqtt.bridge
         unsafe {
-            if mqtt_bridge_send_data(buf.as_ptr(),bytes_written) != 0 {
+            if mqtt_bridge_send_data(msg.name, msg.name_len, buf_data.as_ptr(), bytes_written) != 0 {
                 info!("MQTT Send error!");
                 self.connected_flag = false;
                 return Err(CommError::SendFailed);

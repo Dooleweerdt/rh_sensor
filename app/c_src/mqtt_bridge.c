@@ -14,6 +14,8 @@ LOG_MODULE_REGISTER(mqtt_bridge, LOG_LEVEL_INF);
 #define COMM_TIMEOUT 2000
 #define PUBLISH_TIMEOUT 500
 
+static const uint8_t topic_str[] = "RHsensors/RH4sense/";
+
 static struct mqtt_client client_ctx;
 static struct sockaddr_storage broker_addr;
 static uint8_t rx_buffer[256];
@@ -105,14 +107,21 @@ int32_t mqtt_bridge_connect(void) {
     return err;
 }
 
-int32_t mqtt_bridge_send_data(const uint8_t * payload, size_t len) {
+int32_t mqtt_bridge_send_data(const uint8_t * subtopic, size_t st_len, const uint8_t * payload, size_t pl_len) {
     struct mqtt_publish_param param;
+    uint8_t buffer[128] = {0};
+    uint8_t len = strlen(topic_str) + st_len;
+    memcpy(buffer, topic_str, strlen(topic_str));
+    memcpy(buffer + strlen(topic_str), subtopic, st_len);
+    buffer[len] = '\0';
+
+    //LOG_INF("Topic: %s", buffer);
 
     param.message.topic.qos = MQTT_QOS_0_AT_MOST_ONCE;
-    param.message.topic.topic.utf8 = (uint8_t*)"RH4sense";
-    param.message.topic.topic.size = strlen("RH4sense");
+    param.message.topic.topic.utf8 = buffer;
+    param.message.topic.topic.size = len;
     param.message.payload.data = (uint8_t*)payload;
-    param.message.payload.len = len;
+    param.message.payload.len = pl_len;
     param.message_id = sys_rand16_get();
     
     param.dup_flag = 0;

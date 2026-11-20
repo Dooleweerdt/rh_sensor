@@ -16,14 +16,11 @@ unsafe extern "C" {
     fn init_smp_ble() -> i32;
 }
 
-pub const ID_SHT3X: u32 = 0;
-pub const ID_ONEWIRE: u32 = 1;
-pub const ID_MOCK: u32 = 2;
-
 #[repr(C)]
 #[derive(Default, Debug, Clone, Copy)]
 pub struct SensorMsg {
-    pub source: u32,
+    pub name: *const u8,
+    pub name_len: usize,
     pub temp: f32,
     pub hum: f32,
 }
@@ -41,7 +38,6 @@ pub fn start (mut sensors: Vec<RhtSensor>, mut button: Option<UserButton>) {
     let sense_delay = Duration::millis_at_least(1000);
 
     let btn_present: bool = button.is_some();
-    //let mut btn: UserButton = button.unwrap();
 
     loop {
         if btn_present && let Some(ref mut btn) = button && btn.is_pressed() {
@@ -59,8 +55,7 @@ pub fn start (mut sensors: Vec<RhtSensor>, mut button: Option<UserButton>) {
         }
 
         for s in &mut sensors {
-            let id = match s.name {"SHT3x" => ID_SHT3X, "DS18B20" => ID_ONEWIRE, _ => ID_MOCK};
-            let mut sensor_data = SensorMsg { source: id, temp: 0.0, hum: 0.0 };
+            let mut sensor_data = SensorMsg { name: s.name.as_ptr(), name_len: s.name.len(), temp: 0.0, hum: 0.0 };
 
             if let Ok(t) = s.read_data(SensorChannel::Temperature) {
                 info!("{} Temperature: {} C", s.name, t);
