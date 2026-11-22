@@ -15,7 +15,7 @@ manifest:
 
   projects:
     - name: zephyr
-      remote: zephyr-downstream
+      remote: zephyr-upstream
       #revision: fix_pyocd
       #revision: 684c9e8f32e4373a21098559f748f06915f950c9 #v4.4.0
       revision: v4.5.0
