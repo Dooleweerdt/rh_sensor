@@ -51,6 +51,11 @@
 	};
 };
 
+// Disable SPI2 - as it uses P4 as the SCLK output, so the w1 interface doesn't work.
+&spi2 {
+    status = "disabled";
+};
+
 &usb_serial {
 	status = "okay";
 };
